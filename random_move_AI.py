@@ -60,3 +60,5 @@ while board.is_game_over() is False:
             else:
                 p_move = input("type your move(just like 'a2a4'):")
         turn = chess.BLACK
+
+print("byungwook")
