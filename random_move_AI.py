@@ -11,10 +11,8 @@ board = chess.Board()
 while board.is_game_over() is False:
     os.system('clear')
     print(board)
-    print(board.is_game_over())
-    # if board.is_game_over() is True:
-    #     print("GAME OVER")
-    #     break
+    # print(board.is_game_over())
+    
     if turn is chess.BLACK:
         # computer(AI) play
         legal_list = []
@@ -24,6 +22,7 @@ while board.is_game_over() is False:
         board.push(c_move)
         time.sleep(1.5)
         turn = chess.WHITE
+    
     else:
         # player
         legal_list = []
@@ -36,4 +35,5 @@ while board.is_game_over() is False:
                 board.push(chess.Move.from_uci(p_move))
             else:        
                 p_move = input("type your move(just like 'a2a4'):")
+                break
         turn = chess.BLACK
