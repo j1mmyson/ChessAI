@@ -1,5 +1,5 @@
-import chess
 import random
+import chess
 import os
 import time
 
