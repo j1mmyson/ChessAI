@@ -33,7 +33,7 @@ while board.is_game_over() is False:
         while True:
             if p_move in legal_list:
                 board.push(chess.Move.from_uci(p_move))
+                break
             else:        
                 p_move = input("type your move(just like 'a2a4'):")
-                break
         turn = chess.BLACK
