@@ -8,12 +8,13 @@ gameover = False
 board = chess.Board()
 
 
-while True:
+while board.is_game_over() is False:
     os.system('clear')
     print(board)
-    if(board.is_game_over() is True):
-        print("GAME OVER")
-        break
+    print(board.is_game_over())
+    # if board.is_game_over() is True:
+    #     print("GAME OVER")
+    #     break
     if turn is chess.BLACK:
         # computer(AI) play
         legal_list = []
