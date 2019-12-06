@@ -36,11 +36,20 @@ while board.is_game_over() is False:
         legal_list.append(str(i))
     rmove = chess.Move.from_uci(random.choice(legal_list))
     board.push(rmove)
-    time.sleep(0.5)
-    
+    #time.sleep(0.5)
+   
+    os.system('clear')
+    print(board)
     send(connectionSock, str(rmove))
     
     receive(connectionSock)
 
 if board.is_game_over() is True:
-    print(board.result())
+    #print(board.result())
+    if board.result() is '1-0':
+        print('\nWHITE win\n')
+    elif board.result() is '0-1':
+        print('\nBLACK win\n')
+    else:
+        print('\nDraw!\n')
+    
