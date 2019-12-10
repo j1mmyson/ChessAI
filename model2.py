@@ -132,13 +132,11 @@ for i in range(12):
 beforeBoard = str(board)
 while True:
     receive(clientSock)
-    if board.is_game_over() is True:
-        break
-    
     afterBoard = str(board)
-    
     os.system('clear')
     display()
+    if board.is_game_over() is True:
+        break
 
     legal_list = []
     for i in board.legal_moves:
@@ -153,10 +151,10 @@ while True:
     display()
 
     send(clientSock, str(rmove))
+    beforeBoard = afterBoard
     if board.is_game_over() is True:
         break
 
-    beforeBoard = afterBoard
 
 if board.is_game_over() is True:
     # print(board.result())
