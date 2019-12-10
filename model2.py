@@ -65,10 +65,14 @@ def capturedCount(before_board, after_board):
             if piece_list[j] is after_board[i]:
                 after_list[j] += 1
 
+    # for i in range(len(before_list)):
+    #     if before_list[i] > after_list[i]:
+    #         piece[i][1]+=1
+
     for i in range(len(before_list)):
         if before_list[i] > after_list[i]:
-            piece[i][1]+=1
-
+            if (sum(before_list) > sum(after_list)):
+                piece[i][1]+=1 
 
 port = 8080
 clientSock = socket(AF_INET, SOCK_STREAM)
