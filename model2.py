@@ -22,7 +22,8 @@ def receive(sock):
     board.push(chess.Move.from_uci(decodeMove))
 
 
-def moveStack_list():
+# board.move_stack을 사용, 마지막 움직임 출력
+def moveStackList():
     moveList=[]
     for i in board.move_stack:
         moveList.append(str(i))
@@ -30,7 +31,8 @@ def moveStack_list():
         print('move: %s'%(moveList[-1]))
 
 
-def print_board():
+# display
+def display():
     reboard = str(board)
     for i in range(len(reboard)):
         if reboard[i].islower() is True:
@@ -40,10 +42,16 @@ def print_board():
         else:
             print(CGRAY+BOLD+reboard[i]+CEND, end='')
     print()
-    moveStack_list()
+    moveStackList()
+
+    # p,r,n,b,q,k,P,R,N,B,Q,K = 0
+    for i in range(12):
+        if piece[i][1] >= 1:
+            print('%s: %d'%(piece[i][0],piece[i][1]))
 
 
-def check_captured(before_board, after_board):
+# 잡은 말 count
+def capturedCount(before_board, after_board):
     before_list=[0]*12 
     after_list=[0]*12
 
@@ -105,36 +113,20 @@ def check_captured(before_board, after_board):
 
     for i in range(len(before_list)):
         if before_list[i] > after_list[i]:
-            result = i
             piece[i][1]+=1
-            return piece[result]
-
-
-def count_captured():
-    # p,r,n,b,q,k,P,R,N,B,Q,K = 0
-    for i in range(12):
-        if piece[i][1] >= 1:
-            print('%s: %d'%(piece[i][0],piece[i][1]))
 
 
 port = 8080
-
 clientSock = socket(AF_INET, SOCK_STREAM)
 clientSock.connect(('127.0.0.1', port))
-
 print('CONNECTED')
 
 board = chess.Board()
 piece_list = ['p','r','n','b','q','k','P','R','N','B','Q','K']
 piece = []
-captured_list = []
-
 for i in range(12):
-    line = []
-    for j in range(2):
-        line.append(0)
+    line = [0, 0]
     piece.append(line)
-for i in range(12):
     piece[i][0]= piece_list[i]
 
 while True:
@@ -144,29 +136,23 @@ while True:
 
     os.system('clear')
     before_board = str(board)
-    print_board()
-    count_captured()
+    display()
 
     legal_list = []
     for i in board.legal_moves:
         legal_list.append(str(i))
     rmove = chess.Move.from_uci(random.choice(legal_list))
     board.push(rmove)
-    # time.sleep(0.5)
+
     after_board = str(board)
-    capture = check_captured(before_board, after_board)
-    if capture is not None:
-        captured_list.append(capture)
+    capturedCount(before_board, after_board)
 
     os.system('clear')
     before_board = str(board)
-    print_board()
-    count_captured()
+    display()
 
     after_board = str(board)
-    capture = check_captured(before_board, after_board)
-    if capture is not None:
-        captured_list.append(capture)
+    capturedCount(before_board, after_board)
 
     send(clientSock, str(rmove))
     if board.is_game_over() is True:
