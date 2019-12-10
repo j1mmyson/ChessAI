@@ -28,7 +28,7 @@ def moveStackList():
     for i in board.move_stack:
         moveList.append(str(i))
     if len(moveList) > 0 :
-        print('move: %s'%(moveList[-1]))
+        print('\nmove: %s'%(moveList[-1]))
 
 
 # display
@@ -129,13 +129,15 @@ for i in range(12):
     piece.append(line)
     piece[i][0]= piece_list[i]
 
+beforeBoard = str(board)
 while True:
     receive(clientSock)
     if board.is_game_over() is True:
         break
-
+    
+    afterBoard = str(board)
+    
     os.system('clear')
-    before_board = str(board)
     display()
 
     legal_list = []
@@ -144,19 +146,17 @@ while True:
     rmove = chess.Move.from_uci(random.choice(legal_list))
     board.push(rmove)
 
-    after_board = str(board)
-    capturedCount(before_board, after_board)
+    afterBoard = str(board)
+    capturedCount(beforeBoard, afterBoard)
 
     os.system('clear')
-    before_board = str(board)
     display()
-
-    after_board = str(board)
-    capturedCount(before_board, after_board)
 
     send(clientSock, str(rmove))
     if board.is_game_over() is True:
         break
+
+    beforeBoard = afterBoard
 
 if board.is_game_over() is True:
     # print(board.result())
