@@ -55,61 +55,15 @@ def capturedCount(before_board, after_board):
     before_list=[0]*12 
     after_list=[0]*12
 
-    for i in before_board:
-        if i is 'p':
-            before_list[0] += 1
-        elif i is 'r':
-            before_list[1] += 1
-        elif i is 'n':
-            before_list[2] += 1
-        elif i is 'b':
-            before_list[3] += 1
-        elif i is 'q':
-            before_list[4] += 1
-        elif i is 'k':
-            before_list[5] += 1
-        elif i is 'P':
-            before_list[6] += 1
-        elif i is 'R':
-            before_list[7] += 1
-        elif i is 'N':
-            before_list[8] += 1
-        elif i is 'B':
-            before_list[9] += 1
-        elif i is 'Q':
-            before_list[10] += 1
-        elif i is 'K':
-            before_list[11]+=1
-        else:
-            continue
+    for i in range(len(before_board)):
+        for j in range(len(piece_list)):
+            if piece_list[j] is before_board[i]:
+                before_list[j] += 1
 
-    for i in after_board:
-        if i is 'p':
-            after_list[0] += 1
-        elif i is 'r':
-            after_list[1] += 1
-        elif i is 'n':
-            after_list[2] += 1
-        elif i is 'b':
-            after_list[3] += 1
-        elif i is 'q':
-            after_list[4] += 1
-        elif i is 'k':
-            after_list[5] += 1
-        elif i is 'P':
-            after_list[6] += 1
-        elif i is 'R':
-            after_list[7] += 1
-        elif i is 'N':
-            after_list[8] += 1
-        elif i is 'B':
-            after_list[9] += 1
-        elif i is 'Q':
-            after_list[10] += 1
-        elif i is 'K':
-            after_list[11]+=1  
-        else:
-            continue
+    for i in range(len(after_board)):
+        for j in range(len(piece_list)):
+            if piece_list[j] is after_board[i]:
+                after_list[j] += 1
 
     for i in range(len(before_list)):
         if before_list[i] > after_list[i]:
