@@ -4,16 +4,17 @@ import os
 import time
 from socket import *
 
-board = chess.Board()
 
 def send(sock, move):
     sendData = move
     sock.send(sendData.encode('utf-8'))
 
+
 def receive(sock):
     recvData = sock.recv(1024)
     decodeMove = recvData.decode('utf-8')
     board.push(chess.Move.from_uci(decodeMove))
+
 
 port = 8080
 
@@ -22,8 +23,12 @@ clientSock.connect(('127.0.0.1', port))
 
 print('CONNECTED')
 
-while board.is_game_over() is False:
+board = chess.Board()
+
+while True:
     receive(clientSock)
+    if board.is_game_over() is True:
+        break
 
     os.system('clear')
     print(board)
@@ -33,14 +38,16 @@ while board.is_game_over() is False:
         legal_list.append(str(i))
     rmove = chess.Move.from_uci(random.choice(legal_list))
     board.push(rmove)
-    #time.sleep(0.5)
-   
+    # time.sleep(0.5)
+
     os.system('clear')
     print(board)
     send(clientSock, str(rmove))
+    if board.is_game_over() is True:
+        break
 
 if board.is_game_over() is True:
-    #print(board.result())
+    # print(board.result())
     if board.result() is '1-0':
         print('\nWHITE win\n')
     elif board.result() is '0-1':
