@@ -2,6 +2,7 @@ import chess
 import random
 import os
 import time
+import copy
 from socket import *
 
 
@@ -108,24 +109,18 @@ while True:
     display()
 
     send(connectionSock, str(rmove))
-    beforeBoard = afterBoard
+    beforeBoard = copy.deepcopy(afterBoard)
     if board.is_game_over() is True:
+        print()
+        print(board.result())
         break
 
     receive(connectionSock)
     afterBoard = str(board)
+    #capturedCount(beforeBoard, afterBoard)
     os.system('clear')
     display()
     if board.is_game_over() is True:
+        print()
+        print(board.result())
         break
-
-
-
-if board.is_game_over() is True:
-    # print(board.result())
-    if board.result() is '1-0':
-        print('\nWHITE win\n')
-    elif board.result() is '0-1':
-        print('\nBLACK win\n')
-    else:
-        print('\nDraw!\n')

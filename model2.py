@@ -2,6 +2,7 @@ import chess
 import random
 import os
 import time
+import copy
 from socket import *
 
 
@@ -88,12 +89,17 @@ for i in range(12):
     piece[i][0]= piece_list[i]
 
 beforeBoard = str(board)
+os.system('clear')
+display()
 while True:
     receive(clientSock)
     afterBoard = str(board)
+    #capturedCount(beforeBoard, afterBoard)
     os.system('clear')
     display()
     if board.is_game_over() is True:
+        print()
+        print(board.result())
         break
 
     legal_list = []
@@ -109,16 +115,8 @@ while True:
     display()
 
     send(clientSock, str(rmove))
-    beforeBoard = afterBoard
+    beforeBoard = copy.deepcopy(afterBoard)
     if board.is_game_over() is True:
+        print()
+        print(board.result())
         break
-
-
-if board.is_game_over() is True:
-    # print(board.result())
-    if board.result() is '1-0':
-        print('\nWHITE win\n')
-    elif board.result() is '0-1':
-        print('\nBLACK win\n')
-    else:
-        print('\nDraw!\n')
