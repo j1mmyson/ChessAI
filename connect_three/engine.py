@@ -4,6 +4,10 @@ import random
 import time
 from socket import *
 
+BOLD = '\033[1m'
+CEND = '\033[0m'
+CRED = '\033[31m'
+CGRAY = '\033[90m'
 
 def send(sock, move):
     sendData = move
@@ -27,7 +31,10 @@ def print_board(board):
             print(j, "  ", end='')
             j = j-1
         elif (i in symbol) is True:
-            print(i, "", end='')
+            if i.islower() is True:
+                print(CRED+BOLD+i+CEND, "", end='')
+            else:
+                print(i, "", end='')
         else:
             for k in range(0, int(i)):
                 print("- ", end='')
@@ -78,20 +85,24 @@ while board.is_game_over() is False:
             send(white_connect, 'start')
         white_move = receive(white_connect)
         board.push(chess.Move.from_uci(white_move))
+        if board.is_game_over() is True:
+            break
         send(black_connect, white_move)
-        time.sleep(1)
-        turn = p2_turn
+        time.sleep(0.5)
+        turn = chess.BLACK
     else:
         black_move = receive(black_connect)
         board.push(chess.Move.from_uci(black_move))
+        if board.is_game_over() is True:
+            break
         send(white_connect, black_move)
-        time.sleep(1)
-        turn = p1_turn
+        time.sleep(0.5)
+        turn = chess.WHITE
     os.system('clear')
     print_board(board)
 
 if board.is_game_over() is True:
-    # print(board.result())
+    print(board.result())
     if board.result() is '1-0':
         print('\nWHITE win\n')
     elif board.result() is '0-1':
