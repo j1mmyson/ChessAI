@@ -28,11 +28,13 @@ board = chess.Board()
 
 while True:
     receive(clientSock)
-    if board.is_game_over() is True:
-        break
-
     os.system('clear')
     print(board)
+
+    if board.is_game_over() is True:
+        os.system('clear')
+        print(board)
+        break
 
     legal_list = []
     for i in board.legal_moves:
@@ -41,14 +43,18 @@ while True:
     board.push(rmove)
     # time.sleep(0.5)
 
+    send(clientSock, str(rmove))
     os.system('clear')
     print(board)
-    send(clientSock, str(rmove))
     if board.is_game_over() is True:
+        os.system('clear')
+        print(board)
         break
 
 if board.is_game_over() is True:
     # print(board.result())
+    os.system('clear')
+    print(board)
     if board.result() is '1-0':
         print('\nWHITE win\n')
     elif board.result() is '0-1':

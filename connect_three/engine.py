@@ -9,6 +9,7 @@ CEND = '\033[0m'
 CRED = '\033[31m'
 CGRAY = '\033[90m'
 
+
 def send(sock, move):
     sendData = move
     sock.send(sendData.encode('utf-8'))
@@ -64,14 +65,14 @@ white_socket.bind(('', white_port))
 white_socket.listen(1)
 print(" Connect to White Player...")
 white_connect, white_addr = white_socket.accept()
-print(" connect to white complete prot number:", str(white_addr))
+print(" connect to white complete port number:", str(white_addr))
 
 black_socket = socket(AF_INET, SOCK_STREAM)
 black_socket.bind(('', black_port))
 black_socket.listen(1)
 print(" Connect to Black Player...")
 black_connect, black_addr = black_socket.accept()
-print(" connect to black complete prot number:", str(black_addr))
+print(" connect to black complete port number:", str(black_addr))
 
 turn = chess.WHITE
 gameover = False
@@ -79,24 +80,30 @@ board = chess.Board()
 
 print_board(board)
 
-while board.is_game_over() is False:
+while True:
     if turn == chess.WHITE:
         if board.move_stack == []:
             send(white_connect, 'start')
         white_move = receive(white_connect)
         board.push(chess.Move.from_uci(white_move))
         if board.is_game_over() is True:
+            send(black_connect, white_move)
+            os.system('clear')
+            print_board(board)
             break
         send(black_connect, white_move)
-        time.sleep(0.5)
+        # time.sleep(0.5)
         turn = chess.BLACK
     else:
         black_move = receive(black_connect)
         board.push(chess.Move.from_uci(black_move))
         if board.is_game_over() is True:
+            send(white_connect, black_move)
+            os.system('clear')
+            print_board(board)
             break
         send(white_connect, black_move)
-        time.sleep(0.5)
+        # time.sleep(0.5)
         turn = chess.WHITE
     os.system('clear')
     print_board(board)
