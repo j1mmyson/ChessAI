@@ -55,9 +55,9 @@ if board.is_game_over() is True:
     # print(board.result())
     os.system('clear')
     print(board)
-    if board.result() is '1-0':
+    if board.result() == '1-0':
         print('\nWHITE win\n')
-    elif board.result() is '0-1':
+    elif board.result() == '0-1':
         print('\nBLACK win\n')
     else:
         print('\nDraw!\n')

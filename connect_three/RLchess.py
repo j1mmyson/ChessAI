@@ -82,6 +82,18 @@ print_board(board)
 
 while True:
     if turn == chess.WHITE:
+        '''
+        Agent1 에게 현재의 State를 보내준다.
+        Agent1은 상태를 받아 몬테카를로, 시간차학습, 살사 방법중 한가지의 방법으로
+        현재상태의 가치함수값을 구하고 다음행동을 정한다.
+
+        Alpha Zero의 경우 현재상태에서 가능한 미래의 시나리오를 플레이하고 좋은경로에 대해 우선순위를 두면서,
+        동시에 다른 플레이어가 어떻게 반응할지를 생각하며, 아직 모르는 수들도 탐험해본다.
+        처음보는 상태를 마주하면 그 상태를 평가하고 그렇게 평가된 점수를 이전의 수들의 가치함수에도 반영을 한다.
+
+        미래의 가능성에 대한 생각이 끝나면 가장 많이 탐험한(우선순위가 높은?)행동을 취한다.
+
+        '''
         if board.move_stack == []:
             send(white_connect, 'start')
         white_move = receive(white_connect)
@@ -95,6 +107,9 @@ while True:
         # time.sleep(0.5)
         turn = chess.BLACK
     else:
+        '''
+        Agent2도 Agent1과 같은 방법으로 행동을 정한다.
+        '''
         black_move = receive(black_connect)
         board.push(chess.Move.from_uci(black_move))
         if board.is_game_over() is True:
