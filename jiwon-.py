@@ -11,12 +11,12 @@ CGRAY = '\033[90m'
 
 
 # board.move_stack을 사용, 마지막 움직임 출력
-def lastMove():
-    moveList=[]
+def last_move():
+    move_list=[]
     for i in board.move_stack:
-        moveList.append(str(i))
-    if len(moveList) > 0 :
-        print('\nmove: %s'%(moveList[-1]))
+        move_list.append(str(i))
+    if len(move_list) > 0 :
+        print('\nmove: %s'%(move_list[-1]))
 
 
 # display
@@ -30,7 +30,7 @@ def display():
         else:
             print(CGRAY+BOLD+reboard[i]+CEND, end='')
     print()
-    lastMove()
+    last_move()
 
     # 누적 잡은 말 출력
     for i in range(12):
@@ -39,18 +39,18 @@ def display():
 
 
 # 잡은 말 count
-def capturedCount(before_board, after_board):
+def captured_count(before_board, after_board):
     before_list=[0]*12 
     after_list=[0]*12
 
     for i in range(len(before_board)):
-        for j in range(len(pieceList)):
-            if pieceList[j] is before_board[i]:
+        for j in range(len(piece_list)):
+            if piece_list[j] is before_board[i]:
                 before_list[j] += 1
 
     for i in range(len(after_board)):
-        for j in range(len(pieceList)):
-            if pieceList[j] is after_board[i]:
+        for j in range(len(piece_list)):
+            if piece_list[j] is after_board[i]:
                 after_list[j] += 1
 
     for i in range(len(before_list)):
@@ -60,35 +60,35 @@ def capturedCount(before_board, after_board):
 
 
 board = chess.Board()
-pieceList = ['p','r','n','b','q','k','P','R','N','B','Q','K']
+piece_list = ['p','r','n','b','q','k','P','R','N','B','Q','K']
 piece = []
 for i in range(12):
     line = [0, 0]
     piece.append(line)
-    piece[i][0]= pieceList[i]
+    piece[i][0]= piece_list[i]
 
 os.system('clear')
 display()
 
 epsilon = 0.7 # epsilon의 확률로 랜덤
-randomValue = random.random()
+random_value = random.random()
 
 while True:
-    legalList = []
+    legal_list = []
     for i in board.legal_moves:
-        legalList.append(str(i))
+        legal_list.append(str(i))
 
     # epsilon의 확률로 랜덤
-    if epsilon <= randomValue:
-        selectedMove = chess.Move.from_uci(random.choice(legalList))
+    if epsilon <= random_value:
+        selected_move = chess.Move.from_uci(random.choice(legal_list))
     else:
         print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-        selectedMove = chess.Move.from_uci(random.choice(legalList))
+        selected_move = chess.Move.from_uci(random.choice(legal_list))
 
-    beforeBoard = str(board)
-    board.push(selectedMove)
-    afterBoard = str(board)
-    capturedCount(beforeBoard, afterBoard)
+    before_board = str(board)
+    board.push(selected_move)
+    after_board = str(board)
+    captured_count(before_board, after_board)
 
     os.system('clear')
     display()
