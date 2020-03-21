@@ -12,9 +12,9 @@ CGRAY = '\033[90m'
 
 class LinkedList:
     class Node:
-        def __init__(self, move, init_reward, prev):
+        def __init__(self, move, prev):
             self.move = move
-            self.reward = init_reward
+            self.reward = 0.5
             self.prev = prev
             self.next = []
 
@@ -22,9 +22,9 @@ class LinkedList:
         self.head = self.Node(None, None)
         self.size = 0
 
-    def insert(self, move, init_reward, p):
-        n = self.Node(move, init_reward, p)
-        p.next.append(n)
+    def insert(self, move, p):
+        new_node = self.Node(move, p)
+        p.next.append(new_node)
         self.size += 1
 
 
@@ -88,8 +88,6 @@ for i in range(12):
 os.system('clear')
 display()
 
-# 상수 설정
-init_reward = 0.5
 epsilon = 0.7 # epsilon의 확률로 랜덤
 random_value = random.random()
 
