@@ -17,13 +17,13 @@ class LinkedList:
             self.reward = init_reward
             self.prev = prev
             self.next = []
-    
+
     def __init__(self):
         self.head = self.Node(None, None)
         self.size = 0
 
-    def insert(self, move, p):
-        n = self.Node(move, p)
+    def insert(self, move, init_reward, p):
+        n = self.Node(move, init_reward, p)
         p.next.append(n)
         self.size += 1
 
