@@ -58,7 +58,7 @@ def display():
 
 # 잡은 말 count
 def captured_count(before_board, after_board):
-    before_list=[0]*12 
+    before_list=[0]*12
     after_list=[0]*12
 
     for i in range(len(before_board)):
@@ -74,7 +74,7 @@ def captured_count(before_board, after_board):
     for i in range(len(before_list)):
         if before_list[i] > after_list[i]:
             if (sum(before_list) > sum(after_list)):
-                piece[i][1]+=1 
+                piece[i][1]+=1
 
 
 board = chess.Board()
