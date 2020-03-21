@@ -10,6 +10,25 @@ CRED = '\033[31m'
 CGRAY = '\033[90m'
 
 
+class LinkedList:
+    class Node:
+        def __init__(self, move, prev):
+            self.move = move
+            self.reward = 0.5
+            self.prev = prev
+            self.next = []
+    
+    def __init__(self):
+        self.head = self.Node(None, None)
+        self.head.next = self.tail
+        self.size = 0
+
+    def insert(self, move, p):
+        n = self.Node(move, p)
+        p.next.append(n)
+        self.size += 1
+
+
 # board.move_stack을 사용, 마지막 움직임 출력
 def last_move():
     move_list=[]
