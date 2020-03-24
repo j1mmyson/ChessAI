@@ -115,7 +115,7 @@ while True:
             selected_move = chess.Move.from_uci(current_node.move)
 
     else:
-        if len(current_node.next) ==0:  # next가 비어있는 경우 랜덤하게 고른다
+        if len(current_node.next) == 0:  # next가 비어있는 경우 랜덤하게 고른다
             random_move = random.choice(legal_list)
             chess_model.insert(random_move, current_node)
             current_node = current_node.next[0]
@@ -133,8 +133,13 @@ while True:
                 current_node = current_node.next[-1]
             selected_move = chess.Move.from_uci(current_node.move)
 
+    before_board = str(board)
     board.push(selected_move)
     move_stack.append(selected_move)
+    after_board = str(board)
+    captured_count(before_board, after_board)
+
+
     os.system('clear')
     display()
 
