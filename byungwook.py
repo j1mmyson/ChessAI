@@ -80,7 +80,7 @@ def captured_count(before_board, after_board):
 chess_model = LinkedList()
 current_node = chess_model.head
 board = chess.Board()
-piece_list = ['p','r','n','b','q','k','P','R','N','B','Q','K']
+piece_list = ['p', 'r', 'n', 'b', 'q', 'k', 'P', 'R', 'N', 'B', 'Q', 'K']
 piece = []
 for i in range(12):
     line = [0, 0]
@@ -101,9 +101,9 @@ while True:
     # epsilon의 확률로 랜덤
     random_value = random.random()
     if epsilon <= random_value:
-        if current_node.next[0] is None:  # next가 비어있는 경우 랜덤하게 고른다
+        if len(current_node.next) == 0:  # next가 비어있는 경우 랜덤하게 고른다
             random_move = random.choice(legal_list)
-            current_node.insert(random_move, current_node)
+            chess_model.insert(random_move, current_node)
             current_node = current_node.next[0]
             selected_move = chess.Move.from_uci(current_node.move)
         else:  # reward가 가장 큰 노드 선택
@@ -115,9 +115,9 @@ while True:
             selected_move = chess.Move.from_uci(current_node.move)
 
     else:
-        if current_node.next[0] is None:  # next가 비어있는 경우 랜덤하게 고른다
+        if len(current_node.next) ==0:  # next가 비어있는 경우 랜덤하게 고른다
             random_move = random.choice(legal_list)
-            current_node.insert(random_move, current_node)
+            chess_model.insert(random_move, current_node)
             current_node = current_node.next[0]
             selected_move = chess.Move.from_uci(current_node.move)
         else:
@@ -129,7 +129,7 @@ while True:
                     current_node = i
                     break
             if find == 0:
-                current_node.insert(random_move, current_node)
+                chess_model.insert(random_move, current_node)
                 current_node = current_node.next[-1]
             selected_move = chess.Move.from_uci(current_node.move)
 
