@@ -29,12 +29,12 @@ class LinkedList:
 
 
 # board.move_stack을 사용, 마지막 움직임 출력
-def last_move():
-    move_list=[]
-    for i in board.move_stack:
-        move_list.append(str(i))
-    if len(move_list) > 0 :
-        print('\nmove: %s'%(move_list[-1]))
+# def last_move():
+#     move_list=[]
+#     for i in board.move_stack:
+#         move_list.append(str(i))
+#     if len(move_list) > 0 :
+#         print('\nmove: %s'%(move_list[-1]))
 
 
 # display
@@ -48,7 +48,7 @@ def display():
         else:
             print(CGRAY+BOLD+reboard[i]+CEND, end='')
     print()
-    last_move()
+    # last_move()
 
     # 누적 잡은 말 출력
     for i in range(12):
@@ -80,13 +80,13 @@ def captured_count(before_board, after_board):
 chess_model = LinkedList()
 current_node = chess_model.head
 board = chess.Board()
+floor = 0
 piece_list = ['p','r','n','b','q','k','P','R','N','B','Q','K']
 piece = []
 for i in range(12):
     line = [0, 0]
     piece.append(line)
     piece[i][0]= piece_list[i]
-move_stack = []
 
 os.system('clear')
 display()
@@ -135,7 +135,7 @@ while True:
 
     before_board = str(board)
     board.push(selected_move)
-    move_stack.append(str(selected_move))
+    floor += 1
     after_board = str(board)
     captured_count(before_board, after_board)
 
@@ -145,11 +145,20 @@ while True:
     if board.is_game_over() is True:
         break
 
-if board.result() == "1-0":
-    print('\nWHITE win\n')
-elif board.result() == "0-1":
-    print('\nBLACK win\n')
-elif board.result() == "1/2-1/2":
-    print('\nDraw!\n')
-
-print("move_stack = ", move_stack)
+my_floor = floor
+while True:
+    if board.result() == "1/2-1/2":
+        winning_point = 0.5
+    else:
+        winning_point = 1
+    
+    if my_floor%2 == floor%2:
+        current_node.reward = current_node.reward/3 + winning_point*(my_floor/floor)*2/3
+    else:
+        current_node.reward = current_node.reward/3 + (1-winning_point)*(my_floor/floor)*2/3
+        
+    my_floor -= 1
+    # print(str(current_node.reward))
+    current_node = current_node.prev
+    if current_node.prev is None:
+        break
