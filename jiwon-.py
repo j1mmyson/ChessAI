@@ -77,6 +77,8 @@ def captured_count(before_board, after_board):
                 piece[i][1]+=1
 
 
+chess_model = LinkedList()
+current_node = chess_model.head
 board = chess.Board()
 piece_list = ['p','r','n','b','q','k','P','R','N','B','Q','K']
 piece = []
@@ -84,12 +86,12 @@ for i in range(12):
     line = [0, 0]
     piece.append(line)
     piece[i][0]= piece_list[i]
+move_stack = []
 
 os.system('clear')
 display()
 
 epsilon = 0.7 # epsilon의 확률로 랜덤
-random_value = random.random()
 
 while True:
     legal_list = []
@@ -97,14 +99,43 @@ while True:
         legal_list.append(str(i))
 
     # epsilon의 확률로 랜덤
+    random_value = random.random()
     if epsilon <= random_value:
-        selected_move = chess.Move.from_uci(random.choice(legal_list))
+        if len(current_node.next) == 0:  # next가 비어있는 경우 랜덤하게 고른다
+            random_move = random.choice(legal_list)
+            chess_model.insert(random_move, current_node)
+            current_node = current_node.next[0]
+            selected_move = chess.Move.from_uci(current_node.move)
+        else:  # reward가 가장 큰 노드 선택
+            next_node = current_node.next[0]
+            for i in current_node.next:
+                if next_node.reward < i.reward:
+                    next_node = i
+            current_node = next_node
+            selected_move = chess.Move.from_uci(current_node.move)
+
     else:
-        print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-        selected_move = chess.Move.from_uci(random.choice(legal_list))
+        if len(current_node.next) == 0:  # next가 비어있는 경우 랜덤하게 고른다
+            random_move = random.choice(legal_list)
+            chess_model.insert(random_move, current_node)
+            current_node = current_node.next[0]
+            selected_move = chess.Move.from_uci(current_node.move)
+        else:
+            random_move = random.choice(legal_list)
+            find = 0
+            for i in current_node.next:
+                if random_move == i.move:
+                    find = 1
+                    current_node = i
+                    break
+            if find == 0:
+                chess_model.insert(random_move, current_node)
+                current_node = current_node.next[-1]
+            selected_move = chess.Move.from_uci(current_node.move)
 
     before_board = str(board)
     board.push(selected_move)
+    move_stack.append(str(selected_move))
     after_board = str(board)
     captured_count(before_board, after_board)
 
@@ -112,14 +143,13 @@ while True:
     display()
 
     if board.is_game_over() is True:
-        print()
-        print(board.result())
-        if board.result() == "1-0":
-            print('\nWHITE win\n')
-            break
-        elif board.result() == "0-1":
-            print('\nBLACK win\n')
-            break
-        elif board.result() == "1/2-1/2":
-            print('\nDraw!\n')
-            break
+        break
+
+if board.result() == "1-0":
+    print('\nWHITE win\n')
+elif board.result() == "0-1":
+    print('\nBLACK win\n')
+elif board.result() == "1/2-1/2":
+    print('\nDraw!\n')
+
+print("move_stack = ", move_stack)
