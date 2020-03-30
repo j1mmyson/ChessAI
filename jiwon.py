@@ -2,6 +2,8 @@ import chess
 import random
 import os
 import time
+import pickle
+import sys
 
 
 BOLD = '\033[1m'
@@ -77,6 +79,7 @@ def captured_count(before_board, after_board):
                 piece[i][1]+=1
 
 
+sys.setrecursionlimit(10000)
 chess_model = LinkedList()
 current_node = chess_model.head
 accumulated_board = 0
@@ -87,6 +90,8 @@ for i in range(12):
     piece.append(line)
     piece[i][0]= piece_list[i]
 
+
+# main
 for i in range(10):
     board = chess.Board()
     floor = 0
@@ -102,8 +107,8 @@ for i in range(10):
 
         # epsilon의 확률로 랜덤
         random_value = random.random()
-        if epsilon <= random_value:
-            if len(current_node.next) == 0:  # next가 비어있는 경우 랜덤하게 고른다
+        if epsilon <= random_value: # 랜덤 선택
+            if len(current_node.next) == 0:  # next가 비어있는 경우 랜덤
                 random_move = random.choice(legal_list)
                 chess_model.insert(random_move, current_node)
                 current_node = current_node.next[0]
@@ -117,7 +122,7 @@ for i in range(10):
                 selected_move = chess.Move.from_uci(current_node.move)
 
         else:
-            if len(current_node.next) == 0:  # next가 비어있는 경우 랜덤하게 고른다
+            if len(current_node.next) == 0:  # next가 비어있는 경우 랜덤
                 random_move = random.choice(legal_list)
                 chess_model.insert(random_move, current_node)
                 current_node = current_node.next[0]
@@ -169,6 +174,9 @@ for i in range(10):
             break
     
     accumulated_board += 1
+
+with open('data.pickle', 'wb') as f:
+    pickle.dump(chess_model, f, pickle.HIGHEST_PROTOCOL)
 
 print()
 print(accumulated_board)
