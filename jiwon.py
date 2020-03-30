@@ -79,14 +79,13 @@ def captured_count(before_board, after_board):
 
 chess_model = LinkedList()
 current_node = chess_model.head
+accumulated_board = 0
 piece_list = ['p','r','n','b','q','k','P','R','N','B','Q','K']
 piece = []
 for i in range(12):
     line = [0, 0]
     piece.append(line)
     piece[i][0]= piece_list[i]
-
-epsilon = 0.7 # epsilon의 확률로 랜덤
 
 for i in range(10):
     board = chess.Board()
@@ -98,6 +97,8 @@ for i in range(10):
         legal_list = []
         for i in board.legal_moves:
             legal_list.append(str(i))
+
+        epsilon = 0.9999**accumulated_board # epsilon의 확률로 랜덤, 0.9999^x 곡선으로 epsilon 변화
 
         # epsilon의 확률로 랜덤
         random_value = random.random()
@@ -143,6 +144,8 @@ for i in range(10):
         os.system('clear')
         display()
 
+        print(epsilon)
+
         if board.is_game_over() is True:
             break
 
@@ -153,7 +156,7 @@ for i in range(10):
         else:
             winning_point = 1
         
-        print("winning_point = " + str(winning_point))
+        # print("winning_point = " + str(winning_point))
         if my_floor%2 == floor%2:
             current_node.reward = current_node.reward*2/3 + winning_point*(my_floor/floor)/3
         else:
@@ -164,3 +167,8 @@ for i in range(10):
         current_node = current_node.prev
         if current_node.prev is None:
             break
+    
+    accumulated_board += 1
+
+print()
+print(accumulated_board)
