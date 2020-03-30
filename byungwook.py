@@ -2,6 +2,8 @@ import chess
 import random
 import os
 import time
+import pickle
+import sys
 
 
 BOLD = '\033[1m'
@@ -29,12 +31,12 @@ class LinkedList:
 
 
 # board.move_stack을 사용, 마지막 움직임 출력
-def last_move():
-    move_list = []
-    for i in board.move_stack:
-        move_list.append(str(i))
-    if len(move_list) > 0:
-        print('\nmove: %s' % (move_list[-1]))
+# def last_move():
+#     move_list=[]
+#     for i in board.move_stack:
+#         move_list.append(str(i))
+#     if len(move_list) > 0 :
+#         print('\nmove: %s'%(move_list[-1]))
 
 
 # display
@@ -48,18 +50,18 @@ def display():
         else:
             print(CGRAY+BOLD+reboard[i]+CEND, end='')
     print()
-    last_move()
+    # last_move()
 
     # 누적 잡은 말 출력
     for i in range(12):
         if piece[i][1] >= 1:
-            print('%s: %d' % (piece[i][0], piece[i][1]))
+            print('%s: %d'%(piece[i][0],piece[i][1]))
 
 
 # 잡은 말 count
 def captured_count(before_board, after_board):
-    before_list = [0]*12
-    after_list = [0]*12
+    before_list=[0]*12
+    after_list=[0]*12
 
     for i in range(len(before_board)):
         for j in range(len(piece_list)):
@@ -74,24 +76,25 @@ def captured_count(before_board, after_board):
     for i in range(len(before_list)):
         if before_list[i] > after_list[i]:
             if (sum(before_list) > sum(after_list)):
-                piece[i][1] += 1
+                piece[i][1]+=1
 
 
+sys.setrecursionlimit(10000)
 chess_model = LinkedList()
 current_node = chess_model.head
 board = chess.Board()
-piece_list = ['p', 'r', 'n', 'b', 'q', 'k', 'P', 'R', 'N', 'B', 'Q', 'K']
+floor = 0
+piece_list = ['p','r','n','b','q','k','P','R','N','B','Q','K']
 piece = []
 for i in range(12):
     line = [0, 0]
     piece.append(line)
-    piece[i][0] = piece_list[i]
-move_stack = []
+    piece[i][0]= piece_list[i]
+
 os.system('clear')
 display()
 
-# 상수 설정
-epsilon = 0.7  # epsilon의 확률로 랜덤
+epsilon = 0.7 # epsilon의 확률로 랜덤
 
 while True:
     legal_list = []
@@ -135,10 +138,9 @@ while True:
 
     before_board = str(board)
     board.push(selected_move)
-    move_stack.append(selected_move)
+    floor += 1
     after_board = str(board)
     captured_count(before_board, after_board)
-
 
     os.system('clear')
     display()
@@ -146,11 +148,22 @@ while True:
     if board.is_game_over() is True:
         break
 
-if board.result() == "1-0":
-    print('\nWHITE win\n')
-elif board.result() == "0-1":
-    print('\nBLACK win\n')
-elif board.result() == "1/2-1/2":
-    print('\nDraw!\n')
+my_floor = floor
+while True:
+    if board.result() == "1/2-1/2":
+        winning_point = 0.5
+    else:
+        winning_point = 1
 
-print("move_stack = ", move_stack)
+    if my_floor%2 == floor%2:
+        current_node.reward = current_node.reward/3 + winning_point*(my_floor/floor)*2/3
+    else:
+        current_node.reward = current_node.reward/3 + (1-winning_point)*(my_floor/floor)*2/3
+
+    my_floor -= 1
+    # print(str(current_node.reward))
+    current_node = current_node.prev
+    if current_node.prev is None:
+        break
+with open('data.pickle', 'wb') as f:
+    pickle.dump(chess_model, f, pickle.HIGHEST_PROTOCOL)
