@@ -181,9 +181,3 @@ for i in range(50000):
 
 with open('data.pickle', 'wb') as f:
     pickle.dump(chess_model, f, pickle.HIGHEST_PROTOCOL)
-
-<<<<<<< HEAD
-print()
-print(accumulated_board)
-=======
->>>>>>> 975f20b79c963a8e556a16bda3a6441ecc85b756
