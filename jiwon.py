@@ -160,19 +160,19 @@ for i in range(10):
             winning_point = 0.5
         else:
             winning_point = 1
-        
+
         # print("winning_point = " + str(winning_point))
         if my_floor%2 == floor%2:
             current_node.reward = current_node.reward*2/3 + winning_point*(my_floor/floor)/3
         else:
             current_node.reward = current_node.reward*2/3 + (1-winning_point)*(my_floor/floor)/3
-            
+
         my_floor -= 1
         print(str(current_node.reward))
         current_node = current_node.prev
         if current_node.prev is None:
             break
-    
+
     accumulated_board += 1
 
 with open('data.pickle', 'wb') as f:
