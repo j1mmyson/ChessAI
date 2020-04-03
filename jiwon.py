@@ -92,11 +92,11 @@ for i in range(12):
 
 
 # main
-for i in range(10):
+for i in range(50000):
     board = chess.Board()
     floor = 0
-    os.system('clear')
-    display()
+    #os.system('clear')
+    #display()
 
     while True:
         legal_list = []
@@ -146,12 +146,14 @@ for i in range(10):
         after_board = str(board)
         captured_count(before_board, after_board)
 
-        os.system('clear')
-        display()
+        #os.system('clear')
+        #display()
 
-        print(epsilon)
+        #print(epsilon)
 
         if board.is_game_over() is True:
+            ##display()
+            ##print(str(board.result()))
             break
 
     my_floor = floor
@@ -168,15 +170,15 @@ for i in range(10):
             current_node.reward = current_node.reward*2/3 + (1-winning_point)*(my_floor/floor)/3
             
         my_floor -= 1
-        print(str(current_node.reward))
+        #print(str(current_node.reward))
         current_node = current_node.prev
         if current_node.prev is None:
             break
     
     accumulated_board += 1
+    print(accumulated_board)
+    ##print("model size = " + str(chess_model.size))
 
 with open('data.pickle', 'wb') as f:
     pickle.dump(chess_model, f, pickle.HIGHEST_PROTOCOL)
 
-print()
-print(accumulated_board)
