@@ -29,16 +29,6 @@ class LinkedList:
         p.next.append(new_node)
         self.size += 1
 
-
-# board.move_stack을 사용, 마지막 움직임 출력
-# def last_move():
-#     move_list=[]
-#     for i in board.move_stack:
-#         move_list.append(str(i))
-#     if len(move_list) > 0 :
-#         print('\nmove: %s'%(move_list[-1]))
-
-
 # display
 def display():
     reboard = str(board)
@@ -50,13 +40,6 @@ def display():
         else:
             print(CGRAY+BOLD+reboard[i]+CEND, end='')
     print()
-    # last_move()
-
-    # # 누적 잡은 말 출력
-    # for i in range(12):
-    #     if piece[i][1] >= 1:
-    #         print('%s: %d'%(piece[i][0],piece[i][1]))
-
 
 # 잡은 말 count
 def captured_count(before_board, after_board):
@@ -90,13 +73,10 @@ for i in range(12):
     piece.append(line)
     piece[i][0]= piece_list[i]
 
-
 # main
 for i in range(50000):
     board = chess.Board()
     floor = 0
-    #os.system('clear')
-    #display()
 
     while True:
         legal_list = []
@@ -146,14 +126,7 @@ for i in range(50000):
         after_board = str(board)
         captured_count(before_board, after_board)
 
-        #os.system('clear')
-        #display()
-
-        #print(epsilon)
-
         if board.is_game_over() is True:
-            ##display()
-            ##print(str(board.result()))
             break
 
     my_floor = floor
@@ -163,21 +136,18 @@ for i in range(50000):
         else:
             winning_point = 1
 
-        # print("winning_point = " + str(winning_point))
         if my_floor%2 == floor%2:
             current_node.reward = current_node.reward*2/3 + winning_point*(my_floor/floor)/3
         else:
             current_node.reward = current_node.reward*2/3 + (1-winning_point)*(my_floor/floor)/3
 
         my_floor -= 1
-        #print(str(current_node.reward))
         current_node = current_node.prev
         if current_node.prev is None:
             break
 
     accumulated_board += 1
     print(accumulated_board)
-    ##print("model size = " + str(chess_model.size))
 
 with open('data.pickle', 'wb') as f:
     pickle.dump(chess_model, f, pickle.HIGHEST_PROTOCOL)
