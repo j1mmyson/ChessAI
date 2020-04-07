@@ -78,14 +78,18 @@ def captured_count(before_board, after_board):
             if (sum(before_list) > sum(after_list)):
                 piece[i][1]+=1
 
-try: 
-    data = open('data_01.pickle', 'rb')
+
+try:
+    data = open('data.pickle', 'rb')
 except FileNotFoundError:
+    print("Make new List (Error: FileNotFoundError)")
     chess_model = LinkedList()
     current_node = chess_model.head
 else:
+    with open('data.pickle', 'rb') as f:
+        data = pickle.load(f)
     chess_model = data
-    current_node = data.head
+    current_node = chess_model.head
 
 sys.setrecursionlimit(10000)
 
@@ -185,7 +189,5 @@ for i in range(100):
     print(accumulated_board)
     ##print("model size = " + str(chess_model.size))
 
-with open('data_01.pickle', 'wb') as f:
+with open('data.pickle', 'wb') as f:
     pickle.dump(chess_model, f, pickle.HIGHEST_PROTOCOL)
-
-
