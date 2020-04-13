@@ -23,6 +23,7 @@ class LinkedList:
     def __init__(self):
         self.head = self.Node(None, None)
         self.size = 0
+        self.accumulated_board=0
 
     def insert(self, move, p):
         new_node = self.Node(move, p)
@@ -84,16 +85,14 @@ try:
 except FileNotFoundError:
     print("Make new List (Error: FileNotFoundError)")
     chess_model = LinkedList()
-    current_node = chess_model.head
+    
 else:
     with open('data.pickle', 'rb') as f:
         data = pickle.load(f)
     chess_model = data
-    current_node = chess_model.head
-
+current_node = chess_model.head
 sys.setrecursionlimit(10000)
 
-accumulated_board = 0
 piece_list = ['p','r','n','b','q','k','P','R','N','B','Q','K']
 piece = []
 for i in range(12):
@@ -113,7 +112,7 @@ for i in range(100):
         for i in board.legal_moves:
             legal_list.append(str(i))
 
-        epsilon = 0.9999**accumulated_board # epsilon의 확률로 랜덤, 0.9999^x 곡선으로 epsilon 변화
+        epsilon = 0.9999**chess_model.accumulated_board # epsilon의 확률로 랜덤, 0.9999^x 곡선으로 epsilon 변화
 
         # epsilon의 확률로 랜덤
         random_value = random.random()
@@ -185,7 +184,7 @@ for i in range(100):
         if current_node.prev is None:
             break
 
-    accumulated_board += 1
+    chess_model.accumulated_board += 1
     print(accumulated_board)
     ##print("model size = " + str(chess_model.size))
 
