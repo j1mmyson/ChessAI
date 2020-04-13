@@ -90,6 +90,7 @@ no_data = 0
 for i in range(500):
     turn = chess.WHITE
     board = chess.Board()
+    current_node = chess_model.head
     floor = 0
 
     while True:
@@ -181,5 +182,8 @@ for i in range(500):
                 time.sleep(1)
                 break
 
-
-print(" win = ", win, "\nlose = ", lose, "\ndraw = ", draw, "no data = ", no_data)
+print("win lose draw nodata\n")
+print(win)
+print(lose)
+print(draw)
+print(no_data)
