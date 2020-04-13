@@ -10,7 +10,7 @@ BOLD = '\033[1m'
 CEND = '\033[0m'
 CRED = '\033[31m'
 CGRAY = '\033[90m'
-
+REPEAT = 10
 
 class LinkedList:
     class Node:
@@ -23,6 +23,7 @@ class LinkedList:
     def __init__(self):
         self.head = self.Node(None, None)
         self.size = 0
+        self.accumulated_board = 0
 
     def insert(self, move, p):
         new_node = self.Node(move, p)
@@ -62,10 +63,19 @@ def captured_count(before_board, after_board):
                 piece[i][1]+=1
 
 
+try:
+    data = open('data.pickle', 'rb')
+except FileNotFoundError:
+    print("Make new List (Error: FileNotFoundError)")
+    chess_model = LinkedList()
+else:
+    with open('data.pickle', 'rb') as f:
+        data = pickle.load(f)
+    chess_model = data
+
 sys.setrecursionlimit(10000)
-chess_model = LinkedList()
+#chess_model = LinkedList()
 current_node = chess_model.head
-accumulated_board = 0
 piece_list = ['p','r','n','b','q','k','P','R','N','B','Q','K']
 piece = []
 for i in range(12):
@@ -74,7 +84,7 @@ for i in range(12):
     piece[i][0]= piece_list[i]
 
 # main
-for i in range(50000):
+for i in range(REPEAT):
     board = chess.Board()
     floor = 0
 
@@ -83,7 +93,7 @@ for i in range(50000):
         for i in board.legal_moves:
             legal_list.append(str(i))
 
-        epsilon = 0.9999**accumulated_board # epsilon의 확률로 랜덤, 0.9999^x 곡선으로 epsilon 변화
+        epsilon = 0.9999**chess_model.accumulated_board # epsilon의 확률로 랜덤, 0.9999^x 곡선으로 epsilon 변화
 
         # epsilon의 확률로 랜덤
         random_value = random.random()
@@ -130,12 +140,13 @@ for i in range(50000):
             break
 
     my_floor = floor
-    while True:
-        if board.result() == "1/2-1/2":
-            winning_point = 0.5
-        else:
-            winning_point = 1
 
+    if board.result() == "1/2-1/2":
+        winning_point = 0.5
+    else:
+        winning_point = 1
+
+    while True:
         if my_floor%2 == floor%2:
             current_node.reward = current_node.reward*2/3 + winning_point*(my_floor/floor)/3
         else:
@@ -146,8 +157,8 @@ for i in range(50000):
         if current_node.prev is None:
             break
 
-    accumulated_board += 1
-    print(accumulated_board)
+    chess_model.accumulated_board += 1
+    print(str(chess_model.accumulated_board))
 
 with open('data.pickle', 'wb') as f:
     pickle.dump(chess_model, f, pickle.HIGHEST_PROTOCOL)
