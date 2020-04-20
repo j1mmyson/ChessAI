@@ -66,7 +66,7 @@ def captured_count(before_board, after_board):
 
 print("data load start\n")
 sys.setrecursionlimit(10000)
-with open('data.pickle', 'rb') as f:
+with open('example.pickle', 'rb') as f:
     chess_model = pickle.load(f)
 
 current_node = chess_model.head
@@ -100,10 +100,13 @@ for i in range(500):
             legal_list = []
             for i in board.legal_moves:
                 legal_list.append(str(i))
+            count = 1
+            for i in current_node.next:
+                print(str(count) + " / " + str(i.move) + " / " + str(i.reward))
+                count += 1
             user_move = input("enter the move(like 'a2a4'): ")
             while True:
-                if user_move in legal_list():
-                    legal_list.append(user_move)
+                if user_move in legal_list:
                     board.push(chess.Move.from_uci(user_move))
                     break
                 else:
@@ -120,11 +123,11 @@ for i in range(500):
                 break
 
             before_board = str(board)
-            board.push(user_move)
+            board.push(chess.Move.from_uci(user_move))
             after_board = str(board)
             captured_count(before_board, after_board)
             # time.sleep(0.5)
-            turn = chess.WHITE
+            turn = chess.BLACK
 
         else: 
             legal_list = []
@@ -173,7 +176,7 @@ for i in range(500):
             after_board = str(board)
             captured_count(before_board, after_board)
             # time.sleep(0.5)
-            turn = chess.BLACK
+            turn = chess.WHITE
 
             if board.is_game_over() is True:
                 print(board.result())
