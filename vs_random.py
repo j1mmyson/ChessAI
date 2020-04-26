@@ -85,9 +85,10 @@ win = 0
 lose = 0
 draw = 0
 no_data = 0
+play_rand = 0
 # main
 # Play 500 games
-for i in range(500):
+for i in range(50):
     turn = chess.WHITE
     board = chess.Board()
     current_node = chess_model.head
@@ -95,6 +96,7 @@ for i in range(500):
 
     while True:
         os.system('clear')
+        print(i, "game\n")
         display()
 
         if turn is chess.BLACK:
@@ -103,14 +105,15 @@ for i in range(500):
                 legal_list.append(str(i))
             r_move = chess.Move.from_uci(random.choice(legal_list))
             find = 0
-            for i in current_node.next:
-                if r_move == i.move:
-                    find = 1
-                    current_node = i
-            if find == 0:
-                print("node doesn`t exist\n")
-                no_data = no_data + 1
-                break
+            if play_rand == 0:
+                for i in current_node.next:
+                    if str(r_move) == i.move:
+                        find = 1
+                        current_node = i
+                if find == 0:
+                    print("node doesn`t exist\n")
+                    no_data = no_data + 1
+                    play_rand = 1
 
             before_board = str(board)
             board.push(r_move)
@@ -120,46 +123,59 @@ for i in range(500):
             turn = chess.WHITE
 
         else:
-            legal_list = []
-            for i in board.legal_moves:
-                legal_list.append(str(i))
+            if play_rand == 1:
+                print("play random")
+                legal_list = []
+                for i in board.legal_moves:
+                    legal_list.append(str(i))
 
-            epsilon = 0.2
-
-            # epsilon의 확률로 랜덤
-            random_value = random.random()
-            if epsilon <= random_value:  # 랜덤 선택
-                if len(current_node.next) == 0:  # next가 비어있는 경우 랜덤
-                    random_move = random.choice(legal_list)
-                    chess_model.insert(random_move, current_node)
-                    current_node = current_node.next[0]
-                    selected_move = chess.Move.from_uci(current_node.move)
-                else:  # reward가 가장 큰 노드 선택
-                    next_node = current_node.next[0]
-                    for i in current_node.next:
-                        if next_node.reward < i.reward:
-                            next_node = i
-                    current_node = next_node
-                    selected_move = chess.Move.from_uci(current_node.move)
+                random_move = random.choice(legal_list)
+                chess_model.insert(random_move, current_node)
+                current_node = current_node.next[0]
+                selected_move = chess.Move.from_uci(current_node.move)
 
             else:
-                if len(current_node.next) == 0:  # next가 비어있는 경우 랜덤
-                    random_move = random.choice(legal_list)
-                    chess_model.insert(random_move, current_node)
-                    current_node = current_node.next[0]
-                    selected_move = chess.Move.from_uci(current_node.move)
-                else:
-                    random_move = random.choice(legal_list)
-                    find = 0
-                    for i in current_node.next:
-                        if random_move == i.move:
-                            find = 1
-                            current_node = i
-                            break
-                    if find == 0:
+                legal_list = []
+                for i in board.legal_moves:
+                    legal_list.append(str(i))
+
+                epsilon = 0.2
+
+                # epsilon의 확률로 랜덤
+                random_value = random.random()
+                if epsilon <= random_value:  # 랜덤 선택
+                    if len(current_node.next) == 0:  # next가 비어있는 경우 랜덤
+                        random_move = random.choice(legal_list)
                         chess_model.insert(random_move, current_node)
-                        current_node = current_node.next[-1]
-                    selected_move = chess.Move.from_uci(current_node.move)
+                        current_node = current_node.next[0]
+                        selected_move = chess.Move.from_uci(current_node.move)
+
+                    else:  # reward가 가장 큰 노드 선택
+                        next_node = current_node.next[0]
+                        for i in current_node.next:
+                            if next_node.reward < i.reward:
+                                next_node = i
+                        current_node = next_node
+                        selected_move = chess.Move.from_uci(current_node.move)
+
+                else:
+                    if len(current_node.next) == 0:  # next가 비어있는 경우 랜덤
+                        random_move = random.choice(legal_list)
+                        chess_model.insert(random_move, current_node)
+                        current_node = current_node.next[0]
+                        selected_move = chess.Move.from_uci(current_node.move)
+                    else:
+                        random_move = random.choice(legal_list)
+                        find = 0
+                        for i in current_node.next:
+                            if random_move == i.move:
+                                find = 1
+                                current_node = i
+                                break
+                        if find == 0:
+                            chess_model.insert(random_move, current_node)
+                            current_node = current_node.next[-1]
+                        selected_move = chess.Move.from_uci(current_node.move)
 
             before_board = str(board)
             board.push(selected_move)
