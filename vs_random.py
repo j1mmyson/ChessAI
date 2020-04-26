@@ -93,6 +93,7 @@ for i in range(50):
     board = chess.Board()
     current_node = chess_model.head
     floor = 0
+    play_rand = 0
 
     while True:
         os.system('clear')
@@ -160,19 +161,19 @@ for i in range(50):
             # time.sleep(0.5)
             turn = chess.BLACK
 
-            if board.is_game_over() is True:
-                print(board.result())
-                if board.result() == "1-0":
-                    print('\nWHITE win\n')
-                    win = win+1
-                elif board.result() == "0-1":
-                    print('\nBLACK win\n')
-                    lose = lose + 1
-                elif board.result() == "1/2-1/2":
-                    print('\nDraw!\n')
-                    draw = draw + 1
-                time.sleep(1)
-                break
+        if board.is_game_over() is True:
+            print(board.result())
+            if board.result() == "1-0":
+                print('\nWHITE win\n')
+                win = win+1
+            elif board.result() == "0-1":
+                print('\nBLACK win\n')
+                lose = lose + 1
+            elif board.result() == "1/2-1/2":
+                print('\nDraw!\n')
+                draw = draw + 1
+            time.sleep(1)
+            break
 
 print("win lose draw nodata\n")
 print(win)
