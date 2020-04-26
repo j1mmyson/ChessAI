@@ -10,23 +10,24 @@ BOLD = '\033[1m'
 CEND = '\033[0m'
 CRED = '\033[31m'
 CGRAY = '\033[90m'
-REPEAT = 10
+REPEAT = 250000
 
 class LinkedList:
     class Node:
-        def __init__(self, move, prev):
+        def __init__(self, move, prev, state):
             self.move = move
             self.reward = 0.5
             self.prev = prev
             self.next = []
+            self.state = state
 
     def __init__(self):
-        self.head = self.Node(None, None)
+        self.head = self.Node(None, None, None)
         self.size = 0
         self.accumulated_board = 0
 
-    def insert(self, move, p):
-        new_node = self.Node(move, p)
+    def insert(self, move, p, state):
+        new_node = self.Node(move, p, state)
         p.next.append(new_node)
         self.size += 1
 
@@ -74,7 +75,6 @@ else:
     chess_model = data
 
 sys.setrecursionlimit(10000)
-#chess_model = LinkedList()
 current_node = chess_model.head
 piece_list = ['p','r','n','b','q','k','P','R','N','B','Q','K']
 piece = []
@@ -93,14 +93,18 @@ for i in range(REPEAT):
         for i in board.legal_moves:
             legal_list.append(str(i))
 
-        epsilon = 0.9999**chess_model.accumulated_board # epsilon의 확률로 랜덤, 0.9999^x 곡선으로 epsilon 변화
+        if 0.99999**chess_model.accumulated_board >= 0.2:
+            epsilon = 0.99999**chess_model.accumulated_board # epsilon의 확률로 랜덤, 0.9999^x 곡선으로 epsilon 변화
+        else:
+            epsilon = 0.2
 
         # epsilon의 확률로 랜덤
         random_value = random.random()
+        state = str(board)
         if epsilon <= random_value: # 랜덤 선택
             if len(current_node.next) == 0:  # next가 비어있는 경우 랜덤
                 random_move = random.choice(legal_list)
-                chess_model.insert(random_move, current_node)
+                chess_model.insert(random_move, current_node, state)
                 current_node = current_node.next[0]
                 selected_move = chess.Move.from_uci(current_node.move)
             else:  # reward가 가장 큰 노드 선택
@@ -114,7 +118,7 @@ for i in range(REPEAT):
         else:
             if len(current_node.next) == 0:  # next가 비어있는 경우 랜덤
                 random_move = random.choice(legal_list)
-                chess_model.insert(random_move, current_node)
+                chess_model.insert(random_move, current_node, state)
                 current_node = current_node.next[0]
                 selected_move = chess.Move.from_uci(current_node.move)
             else:
@@ -126,7 +130,7 @@ for i in range(REPEAT):
                         current_node = i
                         break
                 if find == 0:
-                    chess_model.insert(random_move, current_node)
+                    chess_model.insert(random_move, current_node, state)
                     current_node = current_node.next[-1]
                 selected_move = chess.Move.from_uci(current_node.move)
 
@@ -158,7 +162,12 @@ for i in range(REPEAT):
             break
 
     chess_model.accumulated_board += 1
-    print(str(chess_model.accumulated_board))
+    # print(str(chess_model.accumulated_board))
+    if chess_model.accumulated_board%100 == 0:
+        log = open("log.txt", 'a')
+        log.write(str(chess_model.accumulated_board)+"\n")
+        log.close()
+        
 
 with open('data.pickle', 'wb') as f:
     pickle.dump(chess_model, f, pickle.HIGHEST_PROTOCOL)
