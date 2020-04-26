@@ -100,18 +100,18 @@ for i in range(500):
             legal_list = []
             for i in board.legal_moves:
                 legal_list.append(str(i))
-            count = 1
+            # log
+            count_node = 1
             for i in current_node.next:
-                print(str(count) + " / " + str(i.move) + " / " + str(i.reward))
-                count += 1
-            user_move = input("enter the move(like 'a2a4'): ")
+                print(str(count_node) + " / " + str(i.move) + " / " + str(i.reward))
+                count_node += 1
             while True:
-                if user_move in legal_list:
-                    board.push(chess.Move.from_uci(user_move))
-                    break
+                print('you can choose>> \n'+str(legal_list))
+                user_move = input("enter the move(like 'e2e4'): ")
+                if user_move not in legal_list:
+                    print(CRED+"You make the wrong choice. Retry"+CEND)
                 else:
-                    print(CRED+'You make the wrong choice. Retry>>'+CEND)
-                    user_move = input("enter the move(like 'a2a4'): ")
+                    break
             find = 0
             for i in current_node.next:
                 if user_move == i.move:
@@ -120,13 +120,11 @@ for i in range(500):
             if find == 0:
                 print("node doesn`t exist\n")
                 no_data = no_data + 1
-                break
 
             before_board = str(board)
             board.push(chess.Move.from_uci(user_move))
             after_board = str(board)
             captured_count(before_board, after_board)
-            # time.sleep(0.5)
             turn = chess.BLACK
 
         else: 
