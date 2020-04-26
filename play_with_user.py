@@ -66,7 +66,7 @@ def captured_count(before_board, after_board):
 
 print("data load start\n")
 sys.setrecursionlimit(10000)
-with open('example.pickle', 'rb') as f:
+with open('data.pickle', 'rb') as f:
     chess_model = pickle.load(f)
 
 current_node = chess_model.head
@@ -85,15 +85,19 @@ win = 0
 lose = 0
 draw = 0
 no_data = 0
+play_rand = 0
 # main
 # Play 500 games
-for i in range(500):
+for i in range(50):
     turn = chess.WHITE
     board = chess.Board()
+    current_node = chess_model.head
     floor = 0
+    play_rand = 0
 
     while True:
         os.system('clear')
+        print(i, "game\n")
         display()
 
         if turn is chess.WHITE:
@@ -120,53 +124,44 @@ for i in range(500):
             if find == 0:
                 print("node doesn`t exist\n")
                 no_data = no_data + 1
+                # break
 
             before_board = str(board)
             board.push(chess.Move.from_uci(user_move))
             after_board = str(board)
             captured_count(before_board, after_board)
+            # time.sleep(0.5)
             turn = chess.BLACK
 
-        else: 
-            legal_list = []
-            for i in board.legal_moves:
-                legal_list.append(str(i))
+        else:
+            if play_rand == 1:
+                print("play random")
+                legal_list = []
+                for i in board.legal_moves:
+                    legal_list.append(str(i))
 
-            epsilon = 0.2
+                random_move = random.choice(legal_list)
+                selected_move = chess.Move.from_uci(random_move)
 
-            # epsilon의 확률로 랜덤
-            random_value = random.random()
-            if epsilon <= random_value:  # 랜덤 선택
+            else:
+                legal_list = []
+                for i in board.legal_moves:
+                    legal_list.append(str(i))
+
+                # epsilon의 확률로 랜덤
+
                 if len(current_node.next) == 0:  # next가 비어있는 경우 랜덤
                     random_move = random.choice(legal_list)
                     chess_model.insert(random_move, current_node)
                     current_node = current_node.next[0]
                     selected_move = chess.Move.from_uci(current_node.move)
+
                 else:  # reward가 가장 큰 노드 선택
                     next_node = current_node.next[0]
                     for i in current_node.next:
                         if next_node.reward < i.reward:
                             next_node = i
                     current_node = next_node
-                    selected_move = chess.Move.from_uci(current_node.move)
-
-            else:
-                if len(current_node.next) == 0:  # next가 비어있는 경우 랜덤
-                    random_move = random.choice(legal_list)
-                    chess_model.insert(random_move, current_node)
-                    current_node = current_node.next[0]
-                    selected_move = chess.Move.from_uci(current_node.move)
-                else:
-                    random_move = random.choice(legal_list)
-                    find = 0
-                    for i in current_node.next:
-                        if random_move == i.move:
-                            find = 1
-                            current_node = i
-                            break
-                    if find == 0:
-                        chess_model.insert(random_move, current_node)
-                        current_node = current_node.next[-1]
                     selected_move = chess.Move.from_uci(current_node.move)
 
             before_board = str(board)
@@ -176,19 +171,18 @@ for i in range(500):
             # time.sleep(0.5)
             turn = chess.WHITE
 
-            if board.is_game_over() is True:
-                print(board.result())
-                if board.result() == "1-0":
-                    print('\nWHITE win\n')
-                    win = win+1
-                elif board.result() == "0-1":
-                    print('\nBLACK win\n')
-                    lose = lose + 1
-                elif board.result() == "1/2-1/2":
-                    print('\nDraw!\n')
-                    draw = draw + 1
-                time.sleep(1)
-                break
-
+        if board.is_game_over() is True:
+            print(board.result())
+            if board.result() == "1-0":
+                print('\nWHITE win\n')
+                win = win+1
+            elif board.result() == "0-1":
+                print('\nBLACK win\n')
+                lose = lose + 1
+            elif board.result() == "1/2-1/2":
+                print('\nDraw!\n')
+                draw = draw + 1
+            time.sleep(1)
+            break
 
 print(" win = ", win, "\nlose = ", lose, "\ndraw = ", draw, "no data = ", no_data)
