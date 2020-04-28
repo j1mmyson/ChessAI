@@ -86,6 +86,8 @@ lose = 0
 draw = 0
 no_data = 0
 play_rand = 0
+max_floor = 0
+floor = 0
 # main
 # Play 500 games
 for i in range(50):
@@ -161,7 +163,10 @@ for i in range(50):
             # time.sleep(0.5)
             turn = chess.BLACK
 
+        floor = floor + 1
         if board.is_game_over() is True:
+            if max_floor < floor:
+                max_floor = floor
             print(board.result())
             if board.result() == "1-0":
                 print('\nWHITE win\n')
@@ -180,3 +185,5 @@ print(win)
 print(lose)
 print(draw)
 print(no_data)
+print("max floor")
+print(max_floor)
