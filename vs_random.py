@@ -88,6 +88,7 @@ no_data = 0
 play_rand = 0
 max_floor = 0
 floor = 0
+floor_list = []
 # main
 # Play 500 games
 for i in range(50):
@@ -165,6 +166,7 @@ for i in range(50):
 
         floor = floor + 1
         if board.is_game_over() is True:
+            floor_list.append(floor)
             if max_floor < floor:
                 max_floor = floor
             print(board.result())
@@ -185,5 +187,7 @@ print(win)
 print(lose)
 print(draw)
 print(no_data)
+print("Floor")
+print(floor_list)
 print("max floor")
 print(max_floor)
