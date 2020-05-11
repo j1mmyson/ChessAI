@@ -84,19 +84,26 @@ for i in range(12):
 win = 0
 lose = 0
 draw = 0
+match_num = 50  # number of match
 no_data = 0
 play_rand = 0
 max_floor = 0
+min_floor = 100
+rand_num = 0
 floor = 0
+floor_sum = 0
 floor_list = []
+grd_list = []
 # main
 # Play 500 games
-for i in range(50):
+for i in range(match_num):
     turn = chess.WHITE
     board = chess.Board()
     current_node = chess_model.head
     floor = 0
+    rand_num = 0
     play_rand = 0
+
 
     while True:
         os.system('clear')
@@ -129,6 +136,7 @@ for i in range(50):
         else:
             if play_rand == 1:
                 print("play random")
+                rand_num = rand_num+1
                 legal_list = []
                 for i in board.legal_moves:
                     legal_list.append(str(i))
@@ -162,13 +170,17 @@ for i in range(50):
             after_board = str(board)
             captured_count(before_board, after_board)
             # time.sleep(0.5)
+            floor = floor + 1
             turn = chess.BLACK
 
-        floor = floor + 1
         if board.is_game_over() is True:
+            floor_sum = floor_sum + floor
             floor_list.append(floor)
+            grd_list.append(floor-rand_num)
             if max_floor < floor:
                 max_floor = floor
+            if min_floor > floor:
+                min_floor = floor
             print(board.result())
             if board.result() == "1-0":
                 print('\nWHITE win\n')
@@ -188,6 +200,12 @@ print(lose)
 print(draw)
 print(no_data)
 print("Floor")
-print(floor_list)
+for i in range(match_num):
+    print("Floor", i+1, ":", grd_list[i], "/", floor_list[i])
 print("max floor")
 print(max_floor)
+print("min floor")
+print(min_floor)
+average = floor_sum / match_num
+print("Average")
+print(average)
