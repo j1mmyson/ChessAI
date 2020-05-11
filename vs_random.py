@@ -177,10 +177,10 @@ for i in range(match_num):
             floor_sum = floor_sum + floor
             floor_list.append(floor)
             grd_list.append(floor-rand_num)
-            if max_floor < floor:
-                max_floor = floor
-            if min_floor > floor:
-                min_floor = floor
+            if max_floor < floor - rand_num:
+                max_floor = floor - rand_num
+            if min_floor > floor - rand_num:
+                min_floor = floor - rand_num
             print(board.result())
             if board.result() == "1-0":
                 print('\nWHITE win\n')
