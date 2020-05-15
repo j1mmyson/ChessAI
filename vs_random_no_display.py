@@ -110,7 +110,7 @@ for i in range(match_num):
         os.system('clear')
         print(game_num, "game\n")
         game_num = game_num+1
-        display()
+        # display()
 
         if turn is chess.BLACK:
             legal_list = []
@@ -124,20 +124,20 @@ for i in range(match_num):
                         find = 1
                         current_node = i
                 if find == 0:
-                    print("node doesn`t exist\n")
+                    # print("node doesn`t exist\n")
                     no_data = no_data + 1
                     play_rand = 1
 
-            before_board = str(board)
+            # before_board = str(board)
             board.push(r_move)
-            after_board = str(board)
-            captured_count(before_board, after_board)
+            # after_board = str(board)
+            # captured_count(before_board, after_board)
             # time.sleep(0.5)
             turn = chess.WHITE
 
         else:
             if play_rand == 1:
-                print("play random")
+                # print("play random")
                 rand_num = rand_num+1
                 legal_list = []
                 for i in board.legal_moves:
@@ -167,10 +167,10 @@ for i in range(match_num):
                         current_node = next_node
                         selected_move = chess.Move.from_uci(current_node.move)
 
-            before_board = str(board)
+            # before_board = str(board)
             board.push(selected_move)
-            after_board = str(board)
-            captured_count(before_board, after_board)
+            # after_board = str(board)
+            # captured_count(before_board, after_board)
             # time.sleep(0.5)
             floor = floor + 1
             turn = chess.BLACK
@@ -200,7 +200,7 @@ print("win lose draw nodata\n")
 print(win)
 print(lose)
 print(draw)
-print(no_data)
+print(no_data)  # data없어서 랜덤으로 둔 판
 print("Floor")
 for i in range(match_num):
     print("Floor", i+1, ":", grd_list[i], "/", floor_list[i])
