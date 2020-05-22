@@ -26,10 +26,18 @@ class LinkedList:
         self.size = 0
         self.accumulated_board = 0
 
-    def insert(self, move, p, state):
-        new_node = self.Node(move, p, state)
+    def insert(self, move, p):
+        new_node = self.Node(move, p, None)
         p.next.append(new_node)
         self.size += 1
+
+def pre_order(node, new_state, current_node):
+    if(node.state == new_state and node.state.turn == new_state.turn):
+        current_node.next.append(node)
+        return 100
+    else:
+        for i in node.next:
+            pre_order(i, new_state, current_node)
 
 # display
 def display():
@@ -100,14 +108,24 @@ for i in range(REPEAT):
 
         # epsilon의 확률로 랜덤
         random_value = random.random()
-        state = str(board)
-        if epsilon <= random_value: # 랜덤 선택
+        
+        if epsilon <= random_value: # 최선의 수 선택
             if len(current_node.next) == 0:  # next가 비어있는 경우 랜덤
                 random_move = random.choice(legal_list)
-                chess_model.insert(random_move, current_node, state)
-                current_node = current_node.next[0]
-                selected_move = chess.Move.from_uci(current_node.move)
-            else:  # reward가 가장 큰 노드 선택
+                selected_move = chess.Move.from_uci(random_move)
+                board.push(selected_move)
+                
+                state = board
+                search_result = pre_order(chess_model.head, state, current_node)
+
+                if search_result is 100:
+                    current_node = current_node.next[-1]
+                else:
+                    chess_model.insert(random_move, current_node)
+                    current_node.state = board
+                    current_node = current_node.next[-1]
+
+            else:
                 next_node = current_node.next[0]
                 for i in current_node.next:
                     if next_node.reward < i.reward:
@@ -115,12 +133,21 @@ for i in range(REPEAT):
                 current_node = next_node
                 selected_move = chess.Move.from_uci(current_node.move)
 
-        else:
+        else: # 탐험
             if len(current_node.next) == 0:  # next가 비어있는 경우 랜덤
                 random_move = random.choice(legal_list)
-                chess_model.insert(random_move, current_node, state)
-                current_node = current_node.next[0]
-                selected_move = chess.Move.from_uci(current_node.move)
+                selected_move = chess.Move.from_uci(random_move)
+                board.push(selected_move)
+                
+                state = board
+                search_result = pre_order(chess_model.head, state, current_node)
+
+                if search_result is 100:
+                    current_node = current_node.next[-1]
+                else:
+                    chess_model.insert(random_move, current_node)
+                    current_node.state = board
+                    current_node = current_node.next[-1]
             else:
                 random_move = random.choice(legal_list)
                 find = 0
@@ -130,12 +157,11 @@ for i in range(REPEAT):
                         current_node = i
                         break
                 if find == 0:
-                    chess_model.insert(random_move, current_node, state)
+                    chess_model.insert(random_move, current_node)
                     current_node = current_node.next[-1]
                 selected_move = chess.Move.from_uci(current_node.move)
 
         before_board = str(board)
-        board.push(selected_move)
         floor += 1
         after_board = str(board)
         captured_count(before_board, after_board)
