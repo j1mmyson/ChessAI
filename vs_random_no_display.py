@@ -159,7 +159,7 @@ average = floor_sum / match_num
 
 log = open("random_log.txt", 'a')
 log.write("\nwin lose draw nodata\n")
-log.write(str(win) + str(lose) + str(draw) + str(no_data) + "\n")
+log.write(str(win) + " " + str(lose) + " " + str(draw) + " " + str(no_data) + "\n")
 
 # print("Floor")
 # for i in range(match_num):

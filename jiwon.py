@@ -1,11 +1,10 @@
 import chess
 import random
-import os
-import time
 import pickle
 import sys
+import copy
 
-REPEAT = 5
+REPEAT = 10
 
 class LinkedList:
     class Node:
@@ -27,14 +26,13 @@ class LinkedList:
         self.size += 1
 
 def pre_order(node, new_state, current_node):
-    if(node.state == new_state and node.state.turn == new_state.turn):
+    if(str(node.state) == str(new_state) and node.state.turn == new_state.turn):
         current_node.next.append(node)
         return 100
     else:
         for i in node.next:
-            result = pre_order(i, new_state, current_node)
-            if result == 100:
-                break
+            if pre_order(i, new_state, current_node) == 100:
+                return 100
     return 0
 
 try:
@@ -47,7 +45,7 @@ else:
         data = pickle.load(f)
     chess_model = data
 
-sys.setrecursionlimit(1000000)
+sys.setrecursionlimit(10**6)
 current_node = chess_model.head
 
 # main
@@ -66,7 +64,6 @@ for i in range(REPEAT):
             epsilon = 0.2
 
         # epsilon의 확률로 랜덤
-        #random_value = 0
         random_value = random.random()
         
         if not current_node.next: # next가 비어있는 경우 랜덤
@@ -74,7 +71,7 @@ for i in range(REPEAT):
             selected_move = chess.Move.from_uci(random_move)
             board.push(selected_move)
                 
-            state = board
+            state = copy.deepcopy(board)
             search_result = pre_order(chess_model.head, state, current_node)
 
             if search_result == 100:
@@ -104,7 +101,7 @@ for i in range(REPEAT):
                 selected_move = chess.Move.from_uci(random_move)
                 board.push(selected_move)
                 
-                state = board
+                state = copy.deepcopy(board)
                 search_result = pre_order(chess_model.head, state, current_node)
 
                 if search_result == 100:
@@ -125,26 +122,26 @@ for i in range(REPEAT):
     else:
         winning_point = 1
 
-    # while True:
-    #     before_reward = 0
-    #     if my_floor%2 == floor%2:
-    #         before_reward = current_node.reward
-    #         current_node.reward = current_node.reward*2/3 + winning_point*(my_floor/floor)/3
-    #     else:
-    #         before_reward = current_node.reward
-    #         current_node.reward = current_node.reward*2/3 + (1-winning_point)*(my_floor/floor)/3
+    while True:
+        before_reward = 0
+        if my_floor%2 == floor%2:
+            before_reward = current_node.reward
+            current_node.reward = current_node.reward*2/3 + winning_point*(my_floor/floor)/3
+        else:
+            before_reward = current_node.reward
+            current_node.reward = current_node.reward*2/3 + (1-winning_point)*(my_floor/floor)/3
 
-    #     if current_node.prev.next[0] == current_node and before_reward-current_node.reward > 0:
-    #         max_reward = current_node.reward
-    #         for i in current_node.prev.next:
-    #             if max_reward < i.reward:
-    #                 tmp = i
-    #                 i = current_node
-    #                 current_node = tmp
-    #     elif current_node.reward > current_node.prev.next[0].reward and before_reward-current_node.reward < 0:
-    #         tmp = current_node
-    #         current_node = current_node.prev.next[0]
-    #         current_node.prev.next[0] = tmp
+        if current_node.prev.next[0] == current_node and before_reward-current_node.reward > 0:
+            max_reward = current_node.reward
+            for i in current_node.prev.next:
+                if max_reward < i.reward:
+                    tmp = i
+                    i = current_node
+                    current_node = tmp
+        elif current_node.reward > current_node.prev.next[0].reward and before_reward-current_node.reward < 0:
+            tmp = current_node
+            current_node = current_node.prev.next[0]
+            current_node.prev.next[0] = tmp
 
         my_floor -= 1
         current_node = current_node.prev
