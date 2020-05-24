@@ -1,7 +1,8 @@
 import chess
 import random
-import os
-import time
+import copy
+#import os
+#import time
 import pickle
 import sys
 
@@ -10,7 +11,7 @@ BOLD = '\033[1m'
 CEND = '\033[0m'
 CRED = '\033[31m'
 CGRAY = '\033[90m'
-
+REPEAT = 10
 
 class LinkedList:
     class Node:
@@ -31,6 +32,17 @@ class LinkedList:
         p.next.append(new_node)
         self.size += 1
 
+def pre_order(node, new_state, current_node):
+    if(node.state == new_state) and (node.state.turn is new_state.turn):
+        print("find\n")
+        print(node.move)
+        current_node.next.append(node)
+        return 100
+    else:
+        for i in node.next:
+            if pre_order(i, new_state, current_node) == 100:
+                return 100
+    return 0
 
 # display
 def display():
@@ -45,27 +57,6 @@ def display():
     print()
 
 
-# 잡은 말 count
-def captured_count(before_board, after_board):
-    before_list = [0]*12
-    after_list = [0]*12
-
-    for i in range(len(before_board)):
-        for j in range(len(piece_list)):
-            if piece_list[j] is before_board[i]:
-                before_list[j] += 1
-
-    for i in range(len(after_board)):
-        for j in range(len(piece_list)):
-            if piece_list[j] is after_board[i]:
-                after_list[j] += 1
-
-    for i in range(len(before_list)):
-        if before_list[i] > after_list[i]:
-            if (sum(before_list) > sum(after_list)):
-                piece[i][1] += 1
-
-
 try:
     data = open('bw.pickle', 'rb')
 except FileNotFoundError:
@@ -76,16 +67,15 @@ else:
         data = pickle.load(f)
     chess_model = data
 
-sys.setrecursionlimit(10000)
+sys.setrecursionlimit(10**7)
 current_node = chess_model.head
-piece_list = ['p', 'r', 'n', 'b', 'q', 'k', 'P', 'R', 'N', 'B', 'Q', 'K']
+piece_list = ['p','r','n','b','q','k','P','R','N','B','Q','K']
 piece = []
-floor = 0
-repeat = 200000
+search_result = 0
 for i in range(12):
     line = [0, 0]
     piece.append(line)
-    piece[i][0] = piece_list[i]
+    piece[i][0]= piece_list[i]
 
 # main
 for i in range(REPEAT):
@@ -98,57 +88,59 @@ for i in range(REPEAT):
             legal_list.append(str(i))
 
         if 0.99999**chess_model.accumulated_board >= 0.2:
-            epsilon = 0.99999**chess_model.accumulated_board  # epsilon의 확률로 랜덤, 0.9999^x 곡선으로 epsilon 변화
+            epsilon = 0.99999**chess_model.accumulated_board # epsilon의 확률로 랜덤, 0.99999^x 곡선으로 epsilon 변화
         else:
             epsilon = 0.2
 
         # epsilon의 확률로 랜덤
         random_value = random.random()
-        state = str(board)
-        if epsilon <= random_value:  # greedy
-            if len(current_node.next) == 0:  # next가 비어있는 경우 랜덤
-                random_move = random.choice(legal_list)
-                chess_model.insert(random_move, current_node, state)
-                current_node = current_node.next[0]
-                selected_move = chess.Move.from_uci(current_node.move)
-            else:  # reward가 가장 큰 노드 선택
-                next_node = current_node.next[0]
-                for i in current_node.next:
-                    if next_node.reward < i.reward:
-                        next_node = i
-                current_node = next_node
-                selected_move = chess.Move.from_uci(current_node.move)
 
-        else:  # random
-            if len(current_node.next) == 0:  # next가 비어있는 경우 랜덤
-                random_move = random.choice(legal_list)
-                chess_model.insert(random_move, current_node, state)
-                current_node = current_node.next[0]
-                selected_move = chess.Move.from_uci(current_node.move)
+        if not current_node.next: # next가 비어있는 경우 랜덤
+        #if len(current_node.next) == 0:
+            random_move = random.choice(legal_list)
+            selected_move = chess.Move.from_uci(random_move)
+            board.push(selected_move)
+
+            state = copy.deepcopy(board)
+            search_result = pre_order(chess_model.head, state, current_node)
+
+            if search_result == 100:
+                current_node = current_node.next[-1]
             else:
-                random_move = random.choice(legal_list)
-                find = 0
-                for i in current_node.next:
-                    if random_move == i.move:
-                        find = 1
-                        current_node = i
-                        break
-                if find == 0:
-                    chess_model.insert(random_move, current_node, state)
-                    if current_node.next[0].reward < current_node.next[-1].reward:  # 새로만든 노드의 reward가 더 크면 자리바꿈
-                        temp = current_node.next[0]
-                        current_node.next[0] = current_node.next[-1]
-                        current_node.next[-1] = temp
-                        current_node = current_node.next[0]
-                    else:
-                        current_node = current_node.next[-1]
-                selected_move = chess.Move.from_uci(current_node.move)
+                chess_model.insert(random_move, current_node, state)
+                current_node = current_node.next[-1]
 
-        before_board = str(board)
-        board.push(selected_move)
+        elif epsilon <= random_value: # 최선의 수 선택
+            current_node = current_node.next[0]
+            selected_move = chess.Move.from_uci(current_node.move)
+            board.push(selected_move)
+
+        else: # 탐험
+            random_move = random.choice(legal_list)
+            find = False
+            for i in current_node.next:
+                if random_move == i.move:
+                    find = True
+                    current_node = i
+                    break
+            if find is True:
+                selected_move = chess.Move.from_uci(current_node.move)
+                board.push(selected_move)
+            else:
+                selected_move = chess.Move.from_uci(random_move)
+                board.push(selected_move)
+
+                state = copy.deepcopy(board)
+                search_result = pre_order(chess_model.head, state, current_node)
+
+
+                if search_result == 100:
+                    current_node = current_node.next[-1]
+                else:
+                    chess_model.insert(random_move, current_node, state)
+                    current_node = current_node.next[-1]
+
         floor += 1
-        after_board = str(board)
-        captured_count(before_board, after_board)
 
         if board.is_game_over() is True:
             break
@@ -161,27 +153,34 @@ for i in range(REPEAT):
         winning_point = 1
 
     while True:
-        if my_floor % 2 == floor % 2:
+        before_reward = 0
+        if my_floor%2 == floor%2:
+            before_reward = current_node.reward
             current_node.reward = current_node.reward*2/3 + winning_point*(my_floor/floor)/3
-            if current_node.reward > current_node.prev.next[0].reward:
-                temp = current_node
-                current_node = current_node.prev.next[0]
-                current_node.prev.next[0] = temp
         else:
+            before_reward = current_node.reward
             current_node.reward = current_node.reward*2/3 + (1-winning_point)*(my_floor/floor)/3
-            if current_node.reward > current_node.prev.next[0].reward:
-                temp = current_node
-                current_node = current_node.prev.next[0]
-                current_node.prev.next[0] = temp
+
+        if current_node.prev.next[0] == current_node and before_reward-current_node.reward > 0:
+            max_reward = current_node.reward
+            for i in current_node.prev.next:
+                if max_reward < i.reward:
+                    tmp = i
+                    i = current_node
+                    current_node = tmp
+        elif current_node.reward > current_node.prev.next[0].reward and before_reward-current_node.reward < 0:
+            tmp = current_node
+            current_node = current_node.prev.next[0]
+            current_node.prev.next[0] = tmp
 
         my_floor -= 1
         current_node = current_node.prev
         if current_node.prev is None:
             break
 
-    chess_model.accumulated_board = chess_model.accumulated_board+1
+    chess_model.accumulated_board += 1
     # print(str(chess_model.accumulated_board))
-    if chess_model.accumulated_board % 100 == 0:
+    if chess_model.accumulated_board%100 == 0:
         log = open("bwlog.txt", 'a')
         log.write(str(chess_model.accumulated_board)+"\n")
         log.close()
@@ -189,4 +188,3 @@ for i in range(REPEAT):
 
 with open('bw.pickle', 'wb') as f:
     pickle.dump(chess_model, f, pickle.HIGHEST_PROTOCOL)
-    f.close()
