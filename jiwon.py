@@ -17,25 +17,35 @@ class LinkedList:
 
     def __init__(self):
         self.head = self.Node(None, None, None)
+        self.search_list = []
         self.size = 0
         self.accumulated_board = 0
 
     def insert(self, move, p, state):
         new_node = self.Node(move, p, state)
         p.next.append(new_node)
+        self.search_list.append(new_node)
         self.size += 1
 
-def pre_order(node, new_state, current_node):
-    if(str(node.state) == str(new_state) and node.state.turn == new_state.turn):
-        print("preorder if 진입")
-        current_node.next.append(node)
-        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!" + str(chess_model.accumulated_board))
-        return True
-    else:
-        for i in node.next:
-            if pre_order(i, new_state, current_node) is True:
+    def search(self, new_state, current_node):
+        for i in self.search_list:
+            if(str(i.state) == str(new_state) and i.state.turn == new_state.turn):
+                current_node.next.append(i)
                 return True
-    return False
+        return False
+        
+
+# def pre_order(node, new_state, current_node):
+#     if(str(node.state) == str(new_state) and node.state.turn == new_state.turn):
+#         print("preorder if 진입")
+#         current_node.next.append(node)
+#         print("!!!!!!!!!!!!!!!!!!!!!!!!!!!" + str(chess_model.accumulated_board))
+#         return True
+#     else:
+#         for i in node.next:
+#             if pre_order(i, new_state, current_node) is True:
+#                 return True
+#     return False
 
 try:
     data = open('data.pickle', 'rb')
@@ -77,7 +87,7 @@ for i in range(REPEAT):
             board.push(selected_move)
                 
             state = copy.deepcopy(board)
-            search_result = pre_order(chess_model.head, state, current_node)
+            search_result = chess_model.search(state, current_node)
             print(str(chess_model.accumulated_board) + " !!!")
 
             if search_result is True:
@@ -115,7 +125,7 @@ for i in range(REPEAT):
                 
                 state = copy.deepcopy(board)
                 print("pre_order 진입 직전")
-                search_result = pre_order(chess_model.head, state, current_node)
+                search_result = chess_model.search(state, current_node)
                 print(str(chess_model.accumulated_board) + " !!!")
 
                 if search_result is True:
