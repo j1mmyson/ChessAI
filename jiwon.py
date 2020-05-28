@@ -52,6 +52,7 @@ current_node = chess_model.head
 for i in range(REPEAT):
     board = chess.Board()
     floor = 0
+    print(str(chess_model.accumulated_play))
 
     while True:
         legal_list = []
@@ -73,15 +74,16 @@ for i in range(REPEAT):
                 
             state = copy.deepcopy(board)
             search_result = chess_model.search(state, current_node)
-            print("탈출성공")
 
             if search_result is True:
+                current_node.next[-1].prev = current_node
                 current_node = current_node.next[-1]
             else:
                 chess_model.insert(random_move, current_node, state)
                 current_node = current_node.next[-1]
 
         elif epsilon <= random_value: # 최선의 수 선택
+            current_node.next[0].prev = current_node
             current_node = current_node.next[0]
             selected_move = chess.Move.from_uci(current_node.move)
             board.push(selected_move)
@@ -93,6 +95,7 @@ for i in range(REPEAT):
             for i in current_node.next:
                 if random_move == i.move:
                     find = True
+                    i.prev = current_node
                     current_node = i
                     break
             
@@ -105,10 +108,9 @@ for i in range(REPEAT):
                 
                 state = copy.deepcopy(board)
                 search_result = chess_model.search(state, current_node)
-                print("탈출성공")
-
 
                 if search_result is True:
+                    current_node.next[-1].prev = current_node
                     current_node = current_node.next[-1]
                 else:
                     chess_model.insert(random_move, current_node, state)
@@ -157,8 +159,6 @@ for i in range(REPEAT):
         log = open("log.txt", 'a')
         log.write(str(chess_model.accumulated_play)+"\n")
         log.close()
-
-    print(str(chess_model.accumulated_play))
 
 with open('data.pickle', 'wb') as f:
     pickle.dump(chess_model, f, pickle.HIGHEST_PROTOCOL)
