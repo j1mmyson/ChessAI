@@ -11,7 +11,6 @@ class LinkedList:
         def __init__(self, move, prev, state):
             self.move = move
             self.reward = 0.5
-            self.prev = prev
             self.next = []
             self.state = state
 
@@ -120,7 +119,6 @@ for i in range(REPEAT):
         floor += 1
         record_list.append(current_node)
         if board.is_game_over() is True:
-            record_list.reverse()
             break
 
     my_floor = floor
@@ -130,15 +128,14 @@ for i in range(REPEAT):
     else:
         winning_point = 1
 
-    for i in range(len(record_list)):  # 갱신
-        if i % 2 == 0:
+    winner = record_list.peek().state.turn
+    while record_list:
+        pop_node = record_list.pop()
+        if pop_node.state.turn is winner:
             print("+")
-            record_list[i].reward = record_list[i].reward + 1
         else:
             print("-")
-            record_list[i].reward = record_list[i].reward - 1
 
-    record_list.clear()
 
 
 
