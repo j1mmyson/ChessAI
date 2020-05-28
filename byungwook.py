@@ -48,6 +48,7 @@ else:
 sys.setrecursionlimit(10**7)
 current_node = chess_model.head
 
+record_list = []
 # main
 for i in range(REPEAT):
     board = chess.Board()
@@ -73,7 +74,6 @@ for i in range(REPEAT):
 
             state = copy.deepcopy(board)
             search_result = chess_model.search(state, current_node)
-            print("탈출성공")
 
             if search_result is True:
                 current_node.next[-1].prev = current_node
@@ -108,7 +108,6 @@ for i in range(REPEAT):
 
                 state = copy.deepcopy(board)
                 search_result = chess_model.search(state, current_node)
-                print("탈출성공")
 
 
                 if search_result is True:
@@ -119,8 +118,9 @@ for i in range(REPEAT):
                     current_node = current_node.next[-1]
 
         floor += 1
-
+        record_list.append(current_node)
         if board.is_game_over() is True:
+            record_list.reverse()
             break
 
     my_floor = floor
@@ -130,31 +130,18 @@ for i in range(REPEAT):
     else:
         winning_point = 1
 
-    while True:
-        before_reward = 0
-        if my_floor%2 == floor%2:
-            before_reward = current_node.reward
-            current_node.reward = current_node.reward*2/3 + winning_point*(my_floor/floor)/3
+    for i in range(len(record_list)):  # 갱신
+        if i % 2 == 0:
+            print("+")
+            record_list[i].reward = record_list[i].reward + 1
         else:
-            before_reward = current_node.reward
-            current_node.reward = current_node.reward*2/3 + (1-winning_point)*(my_floor/floor)/3
+            print("-")
+            record_list[i].reward = record_list[i].reward - 1
 
-        if current_node.prev.next[0] == current_node and before_reward-current_node.reward > 0:
-            max_reward = current_node.reward
-            for i in current_node.prev.next:
-                if max_reward < i.reward:
-                    tmp = i
-                    i = current_node
-                    current_node = tmp
-        elif current_node.reward > current_node.prev.next[0].reward and before_reward-current_node.reward < 0:
-            tmp = current_node
-            current_node = current_node.prev.next[0]
-            current_node.prev.next[0] = tmp
+    record_list.clear()
 
-        my_floor -= 1
-        current_node = current_node.prev
-        if current_node.prev is None:
-            break
+
+
 
     chess_model.accumulated_play += 1
     if chess_model.accumulated_play%100 == 0:
