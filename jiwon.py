@@ -4,7 +4,7 @@ import pickle
 import sys
 import copy
 
-REPEAT = 3
+REPEAT = 20
 
 class LinkedList:
     class Node:
@@ -29,7 +29,7 @@ class LinkedList:
     def search(self, new_state, current_node):
         for i in self.search_list:
             if(str(i.state) == str(new_state) and i.state.turn == new_state.turn):
-                print("진입")
+                print("aaaa")
                 current_node.next.append(i)
                 return True
         return False
@@ -50,7 +50,9 @@ current_node = chess_model.head
 # main
 for i in range(REPEAT):
     board = chess.Board()
+    chess_model.head.state = copy.deepcopy(board)
     record_list = []
+    record_list.append(current_node)
     print(str(chess_model.accumulated_play))
 
     while True:
@@ -132,18 +134,19 @@ for i in range(REPEAT):
             before_reward = copy.deepcopy(pop_node.reward)
             pop_node.reward = pop_node.reward*2/3 + (-1)*(my_index/stack_size)/3
 
-        if record_list[-1].next[0] == pop_node and before_reward-pop_node.reward > 0:
-            max_reward = copy.deepcopy(pop_node.reward)
-            tmp = []
-            for i in record_list[-1].next:
-                tmp.append(i.reward)
-            found_index = tmp.index(max(tmp))
-            record_list[-1].next[found_index], pop_node = pop_node, record_list[-1].next[found_index]
-        elif pop_node.reward > record_list[-1].next[0].reward and before_reward-pop_node.reward < 0:
-            pop_node, record_list[-1].next[0] = record_list[-1].next[0], pop_node
+        if record_list:
+            if record_list[-1].next[0] == pop_node and before_reward-pop_node.reward > 0:
+                max_reward = copy.deepcopy(pop_node.reward)
+                tmp = []
+                for i in record_list[-1].next:
+                    tmp.append(i.reward)
+                found_index = tmp.index(max(tmp))
+                record_list[-1].next[found_index], pop_node = pop_node, record_list[-1].next[found_index]
+            elif pop_node.reward > record_list[-1].next[0].reward:
+                pop_node, record_list[-1].next[0] = record_list[-1].next[0], pop_node
 
     chess_model.accumulated_play += 1
-    if chess_model.accumulated_play%100 == 0:
+    if chess_model.accumulated_play%10 == 0:
         log = open("log.txt", 'a')
         log.write(str(chess_model.accumulated_play)+"\n")
         log.close()
