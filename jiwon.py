@@ -8,21 +8,20 @@ REPEAT = 3
 
 class LinkedList:
     class Node:
-        def __init__(self, move, prev, state):
+        def __init__(self, move, state):
             self.move = move
             self.reward = 0.5
-            self.prev = prev
             self.next = []
             self.state = state
 
     def __init__(self):
-        self.head = self.Node(None, None, None)
+        self.head = self.Node(None, None)
         self.search_list = []
         self.size = 0
         self.accumulated_play = 0
 
     def insert(self, move, p, state):
-        new_node = self.Node(move, p, state)
+        new_node = self.Node(move, state)
         p.next.append(new_node)
         self.search_list.append(new_node)
         self.size += 1
@@ -51,7 +50,7 @@ current_node = chess_model.head
 # main
 for i in range(REPEAT):
     board = chess.Board()
-    floor = 0
+    record_list = []
     print(str(chess_model.accumulated_play))
 
     while True:
@@ -76,14 +75,12 @@ for i in range(REPEAT):
             search_result = chess_model.search(state, current_node)
 
             if search_result is True:
-                current_node.next[-1].prev = current_node
                 current_node = current_node.next[-1]
             else:
                 chess_model.insert(random_move, current_node, state)
                 current_node = current_node.next[-1]
 
         elif epsilon <= random_value: # 최선의 수 선택
-            current_node.next[0].prev = current_node
             current_node = current_node.next[0]
             selected_move = chess.Move.from_uci(current_node.move)
             board.push(selected_move)
@@ -95,7 +92,6 @@ for i in range(REPEAT):
             for i in current_node.next:
                 if random_move == i.move:
                     find = True
-                    i.prev = current_node
                     current_node = i
                     break
             
@@ -110,49 +106,42 @@ for i in range(REPEAT):
                 search_result = chess_model.search(state, current_node)
 
                 if search_result is True:
-                    current_node.next[-1].prev = current_node
                     current_node = current_node.next[-1]
                 else:
                     chess_model.insert(random_move, current_node, state)
                     current_node = current_node.next[-1]
 
-        floor += 1
-
+        record_list.append(current_node)
         if board.is_game_over() is True:
             break
-
-    my_floor = floor
 
     if board.result() == "1/2-1/2":
         winning_point = 0.5
     else:
         winning_point = 1
 
-    while True:
-        before_reward = 0
-        if my_floor%2 == floor%2:
-            before_reward = current_node.reward
-            current_node.reward = current_node.reward*2/3 + winning_point*(my_floor/floor)/3
+    winner = record_list[-1].state.turn
+    stack_size = len(record_list)
+    while record_list:
+        my_index = len(record_list)
+        pop_node = record_list.pop()
+
+        if pop_node.state.turn is winner:
+            before_reward = copy.deepcopy(pop_node.reward)
+            pop_node.reward = pop_node.reward*2/3 + winning_point*(my_index/stack_size)/3
         else:
-            before_reward = current_node.reward
-            current_node.reward = current_node.reward*2/3 + (1-winning_point)*(my_floor/floor)/3
+            before_reward = copy.deepcopy(pop_node.reward)
+            pop_node.reward = pop_node.reward*2/3 + (1-winning_point)*(my_index/stack_size)/3
 
-        if current_node.prev.next[0] == current_node and before_reward-current_node.reward > 0:
-            max_reward = current_node.reward
-            for i in current_node.prev.next:
-                if max_reward < i.reward:
-                    tmp = i
-                    i = current_node
-                    current_node = tmp
-        elif current_node.reward > current_node.prev.next[0].reward and before_reward-current_node.reward < 0:
-            tmp = current_node
-            current_node = current_node.prev.next[0]
-            current_node.prev.next[0] = tmp
-
-        my_floor -= 1
-        current_node = current_node.prev
-        if current_node.prev is None:
-            break
+        if record_list[-1].next[0] == pop_node and before_reward-pop_node.reward > 0:
+            max_reward = copy.deepcopy(pop_node.reward)
+            tmp = []
+            for i in record_list[-1].next:
+                tmp.append(i.reward)
+            found_index = tmp.index(max(tmp))
+            record_list[-1].next[found_index], pop_node = pop_node, record_list[-1].next[found_index]
+        elif pop_node.reward > record_list[-1].next[0].reward and before_reward-pop_node.reward < 0:
+            pop_node, record_list[-1].next[0] = record_list[-1].next[0], pop_node
 
     chess_model.accumulated_play += 1
     if chess_model.accumulated_play%100 == 0:
