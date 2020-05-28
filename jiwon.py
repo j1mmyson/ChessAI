@@ -115,23 +115,22 @@ for i in range(REPEAT):
         if board.is_game_over() is True:
             break
 
-    if board.result() == "1/2-1/2":
-        winning_point = 0.5
-    else:
-        winning_point = 1
-
     winner = record_list[-1].state.turn
     stack_size = len(record_list)
     while record_list:
         my_index = len(record_list)
         pop_node = record_list.pop()
 
-        if pop_node.state.turn is winner:
+        if board.result() == "1/2-1/2":
             before_reward = copy.deepcopy(pop_node.reward)
-            pop_node.reward = pop_node.reward*2/3 + winning_point*(my_index/stack_size)/3
+            pop_node.reward = pop_node.reward*2/3 + (-0.5)*(my_index/stack_size)/3
+
+        elif pop_node.state.turn is winner:
+            before_reward = copy.deepcopy(pop_node.reward)
+            pop_node.reward = pop_node.reward*2/3 + 1*(my_index/stack_size)/3
         else:
             before_reward = copy.deepcopy(pop_node.reward)
-            pop_node.reward = pop_node.reward*2/3 + (1-winning_point)*(my_index/stack_size)/3
+            pop_node.reward = pop_node.reward*2/3 + (-1)*(my_index/stack_size)/3
 
         if record_list[-1].next[0] == pop_node and before_reward-pop_node.reward > 0:
             max_reward = copy.deepcopy(pop_node.reward)
