@@ -24,11 +24,4 @@ with open('data.pickle', 'rb') as f:
 
 current_node = data.head
 
-while(1):
-    # print(current_node.reward)
-    current_node = current_node.next[0]
-    if len(current_node.next) == 0:
-        print(data.size)
-        break
-
-
+print(data.size)

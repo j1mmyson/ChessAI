@@ -3,8 +3,9 @@ import random
 import pickle
 import sys
 import copy
+import datetime
 
-REPEAT = 20
+REPEAT = 100
 
 class LinkedList:
     class Node:
@@ -33,6 +34,10 @@ class LinkedList:
                 current_node.next.append(i)
                 return True
         return False
+
+log = open("log.txt", 'a')
+log.write(str(datetime.datetime.now())+"\n")
+log.close()
 
 try:
     data = open('data.pickle', 'rb')
@@ -146,12 +151,16 @@ for i in range(REPEAT):
                 pop_node, record_list[-1].next[0] = record_list[-1].next[0], pop_node
 
     chess_model.accumulated_play += 1
-    if chess_model.accumulated_play%10 == 0:
-        log = open("log.txt", 'a')
-        log.write(str(chess_model.accumulated_play)+"\n")
-        log.close()
+    # if chess_model.accumulated_play%10 == 0:
+    log = open("log.txt", 'a')
+    log.write(str(chess_model.accumulated_play)+"\n")
+    log.close()
 
 with open('data.pickle', 'wb') as f:
     pickle.dump(chess_model, f, pickle.HIGHEST_PROTOCOL)
+
+log = open("log.txt", 'a')
+log.write(str(datetime.datetime.now())+"\n")
+log.close()
 
 print("OK")

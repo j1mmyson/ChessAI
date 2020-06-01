@@ -1,55 +1,50 @@
 import chess
 import random
-import os
-import time
 import pickle
 import sys
 
-
-BOLD = '\033[1m'
-CEND = '\033[0m'
-CRED = '\033[31m'
-CGRAY = '\033[90m'
-
+REPEAT = 50
 
 class LinkedList:
     class Node:
-        def __init__(self, move, prev):
+        def __init__(self, move, state):
             self.move = move
             self.reward = 0.5
-            self.prev = prev
             self.next = []
+            self.state = state
 
     def __init__(self):
         self.head = self.Node(None, None)
+        self.search_list = []
         self.size = 0
         self.accumulated_board = 0
 
-    def insert(self, move, p):
-        new_node = self.Node(move, p)
+    def insert(self, move, p, state):
+        new_node = self.Node(move, state)
         p.next.append(new_node)
+        self.search_list.append(new_node)
         self.size += 1
 
+    def search(self, new_state, current_node):
+        for i in self.search_list:
+            if(str(i.state) == str(new_state) and i.state.turn == new_state.turn):
+                current_node.next.append(i)
+                return True
+        return False
 
-print("data load start\n")
-sys.setrecursionlimit(10000)
+
+print("data load start\n\n")
+
 with open('data.pickle', 'rb') as f:
     chess_model = pickle.load(f)
 
+sys.setrecursionlimit(10**7)
 current_node = chess_model.head
-
-piece_list = ['p','r','n','b','q','k','P','R','N','B','Q','K']
-piece = []
-for i in range(12):
-    line = [0, 0]
-    piece.append(line)
-    piece[i][0] = piece_list[i]
 
 # model's win rate
 win = 0
 lose = 0
 draw = 0
-match_num = 50  # number of match
 no_data = 0
 play_rand = 0
 max = 0
@@ -61,7 +56,8 @@ floor_list = []
 grd_list = []
 
 # main
-for i in range(match_num):
+for i in range(REPEAT):
+    print(str(i))
     turn = chess.WHITE
     board = chess.Board()
     current_node = chess_model.head
@@ -70,10 +66,7 @@ for i in range(match_num):
     play_rand = 0
     game_num = 0
 
-
     while True:
-        os.system('clear')
-        # print(game_num, "game\n")
         game_num = game_num+1
 
         if turn is chess.BLACK:
@@ -113,7 +106,7 @@ for i in range(match_num):
 
                 if len(current_node.next) == 0:  # next가 비어있는 경우 랜덤
                     random_move = random.choice(legal_list)
-                    chess_model.insert(random_move, current_node)
+                    chess_model.insert(random_move, current_node, None)
                     current_node = current_node.next[0]
                     selected_move = chess.Move.from_uci(current_node.move)
 
@@ -135,7 +128,7 @@ for i in range(match_num):
             grd_list.append(floor-rand_num)
 
             log = open("random_log.txt", 'a')
-            log.write(str(game_num) + ":" + str(floor-rand_num) + "/" + str(floor) + "\n")
+            log.write(str(floor-rand_num) + "/" + str(floor) + "\n")
             log.close()
 
             if max < floor - rand_num:
@@ -152,18 +145,15 @@ for i in range(match_num):
             elif board.result() == "1/2-1/2":
                 # print('\nDraw!\n')
                 draw = draw + 1
-            time.sleep(1)
             break
 
-average = floor_sum / match_num
+average = floor_sum / REPEAT
 
 log = open("random_log.txt", 'a')
-log.write("\nwin lose draw nodata\n")
-log.write(str(win) + " " + str(lose) + " " + str(draw) + " " + str(no_data) + "\n")
-
-# print("Floor")
-# for i in range(match_num):
-#     print("Floor", i+1, ":", grd_list[i], "/", floor_list[i])
+log.write("win = " + str(win) + "\n")
+log.write("lose = " + str(lose) + "\n")
+log.write("draw = " + str(draw) + "\n")
+log.write("no_data = " + str(no_data) + "\n\n")
 
 log.write("max = " + str(max) + "\n")
 log.write("min = " + str(min) + "\n")
