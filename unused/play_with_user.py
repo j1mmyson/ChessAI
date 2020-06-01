@@ -50,7 +50,7 @@ def display():
             print(CGRAY+BOLD+reboard[i]+CEND, end='')
     print()
 
-print("data load start\n\n")
+print("data load start\n")
 
 with open('data.pickle', 'rb') as f:
     chess_model = pickle.load(f)
@@ -74,7 +74,6 @@ grd_list = []
 
 # main
 for i in range(REPEAT):
-    print(str(i))
     turn = chess.WHITE
     board = chess.Board()
     current_node = chess_model.head
@@ -83,7 +82,7 @@ for i in range(REPEAT):
     play_rand = 0
 
     while True:
-        # os.system('clear')
+        os.system('clear')
         display()
 
         if turn is chess.WHITE:
@@ -111,7 +110,7 @@ for i in range(REPEAT):
 
             board.push(chess.Move.from_uci(user_move))
             turn = chess.BLACK
-            time.sleep(0.5)
+            #time.sleep(0.5)
 
         else:
             if play_rand == 1:
@@ -147,7 +146,7 @@ for i in range(REPEAT):
             board.push(selected_move)
             floor = floor + 1
             turn = chess.WHITE
-            time.sleep(0.5)
+            #time.sleep(0.5)
 
         if board.is_game_over() is True:
             floor_sum = floor_sum + floor
@@ -164,13 +163,13 @@ for i in range(REPEAT):
                 min = floor - rand_num
             # print(board.result())
             if board.result() == "1-0":
-                # print('\nWHITE win\n')
+                print('\nWHITE win\n')
                 win = win+1
             elif board.result() == "0-1":
-                # print('\nBLACK win\n')
+                print('\nBLACK win\n')
                 lose = lose + 1
             elif board.result() == "1/2-1/2":
-                # print('\nDraw!\n')
+                print('\nDraw!\n')
                 draw = draw + 1
             break
 

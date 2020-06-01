@@ -5,7 +5,7 @@ import sys
 import copy
 import datetime
 
-REPEAT = 100
+REPEAT = 5
 
 class LinkedList:
     class Node:
@@ -14,19 +14,16 @@ class LinkedList:
             self.reward = 0.5
             self.next = []
             self.state = state
-
     def __init__(self):
         self.head = self.Node(None, None)
         self.search_list = []
         self.size = 0
         self.accumulated_play = 0
-
     def insert(self, move, p, state):
         new_node = self.Node(move, state)
         p.next.append(new_node)
         self.search_list.append(new_node)
         self.size += 1
-
     def search(self, new_state, current_node):
         for i in self.search_list:
             if(str(i.state) == str(new_state) and i.state.turn == new_state.turn):
@@ -50,25 +47,25 @@ else:
     chess_model = data
 
 sys.setrecursionlimit(10**7)
-current_node = chess_model.head
 
 # main
 for i in range(REPEAT):
     board = chess.Board()
     chess_model.head.state = copy.deepcopy(board)
+    current_node = chess_model.head
     record_list = []
     record_list.append(current_node)
     print(str(chess_model.accumulated_play))
+
+    if 0.99999**chess_model.accumulated_play >= 0.2:
+        epsilon = 0.99999**chess_model.accumulated_play # epsilon의 확률로 랜덤, 0.99999^x 곡선으로 epsilon 변화
+    else:
+        epsilon = 0.2
 
     while True:
         legal_list = []
         for i in board.legal_moves:
             legal_list.append(str(i))
-
-        if 0.99999**chess_model.accumulated_play >= 0.2:
-            epsilon = 0.99999**chess_model.accumulated_play # epsilon의 확률로 랜덤, 0.99999^x 곡선으로 epsilon 변화
-        else:
-            epsilon = 0.2
 
         # epsilon의 확률로 랜덤
         random_value = random.random()

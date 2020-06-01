@@ -3,39 +3,55 @@ import random
 import pickle
 import sys
 
-REPEAT = 50
+REPEAT = 200
+
+# class LinkedList:
+#     class Node:
+#         def __init__(self, move, state):
+#             self.move = move
+#             self.reward = 0.5
+#             self.next = []
+#             self.state = state
+
+#     def __init__(self):
+#         self.head = self.Node(None, None)
+#         self.search_list = []
+#         self.size = 0
+#         self.accumulated_board = 0
+
+#     def insert(self, move, p, state):
+#         new_node = self.Node(move, state)
+#         p.next.append(new_node)
+#         self.search_list.append(new_node)
+#         self.size += 1
+
+#     def search(self, new_state, current_node):
+#         for i in self.search_list:
+#             if(str(i.state) == str(new_state) and i.state.turn == new_state.turn):
+#                 current_node.next.append(i)
+#                 return True
+#         return False
 
 class LinkedList:
     class Node:
-        def __init__(self, move, state):
+        def __init__(self, move, prev):
             self.move = move
             self.reward = 0.5
+            self.prev = prev
             self.next = []
-            self.state = state
 
     def __init__(self):
         self.head = self.Node(None, None)
-        self.search_list = []
         self.size = 0
-        self.accumulated_board = 0
 
-    def insert(self, move, p, state):
-        new_node = self.Node(move, state)
+    def insert(self, move, p):
+        new_node = self.Node(move, p)
         p.next.append(new_node)
-        self.search_list.append(new_node)
         self.size += 1
 
-    def search(self, new_state, current_node):
-        for i in self.search_list:
-            if(str(i.state) == str(new_state) and i.state.turn == new_state.turn):
-                current_node.next.append(i)
-                return True
-        return False
+print("data load start\n")
 
-
-print("data load start\n\n")
-
-with open('data.pickle', 'rb') as f:
+with open('no_state_data_250000.pickle', 'rb') as f:
     chess_model = pickle.load(f)
 
 sys.setrecursionlimit(10**7)
@@ -51,7 +67,6 @@ max = 0
 min = 100
 rand_num = 0
 floor = 0
-floor_sum = 0
 floor_list = []
 grd_list = []
 
@@ -123,7 +138,6 @@ for i in range(REPEAT):
             turn = chess.BLACK
 
         if board.is_game_over() is True:
-            floor_sum = floor_sum + floor
             floor_list.append(floor)
             grd_list.append(floor-rand_num)
 
@@ -147,7 +161,6 @@ for i in range(REPEAT):
                 draw = draw + 1
             break
 grd_avg = sum(grd_list)/len(grd_list)
-average = floor_sum / REPEAT
 
 log = open("random_log.txt", 'a')
 log.write("win = " + str(win) + "\n")
