@@ -146,7 +146,7 @@ for i in range(REPEAT):
                 # print('\nDraw!\n')
                 draw = draw + 1
             break
-
+grd_avg = sum(grd_list)/len(grd_list)
 average = floor_sum / REPEAT
 
 log = open("random_log.txt", 'a')
@@ -157,5 +157,5 @@ log.write("no_data = " + str(no_data) + "\n\n")
 
 log.write("max = " + str(max) + "\n")
 log.write("min = " + str(min) + "\n")
-log.write("average = " + str(average) + "\n")
+log.write("average = " + str(grd_avg) + "\n")
 log.close()
