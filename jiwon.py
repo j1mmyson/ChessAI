@@ -5,7 +5,7 @@ import sys
 import copy
 import datetime
 
-REPEAT = 5
+REPEAT = 50
 
 class LinkedList:
     class Node:
@@ -16,21 +16,30 @@ class LinkedList:
             self.state = state
     def __init__(self):
         self.head = self.Node(None, None)
-        self.search_list = []
+        self.search_list = [[]]*33
         self.size = 0
         self.accumulated_play = 0
     def insert(self, move, p, state):
         new_node = self.Node(move, state)
         p.next.append(new_node)
-        self.search_list.append(new_node)
+        counting_result = counting(state)
+        self.search_list[counting_result].append(new_node)
         self.size += 1
     def search(self, new_state, current_node):
-        for i in self.search_list:
+        counting_result = counting(new_state)
+        for i in self.search_list[counting_result]:
             if(str(i.state) == str(new_state) and i.state.turn == new_state.turn):
                 print("aaaa")
                 current_node.next.append(i)
                 return True
         return False
+
+def counting(board):
+    count = 0
+    for i in range(len(str(board))):
+        if str(board)[i] != '.' and str(board)[i] != '\n' and str(board)[i] != ' ':
+            count += 1
+    return count
 
 log = open("log.txt", 'a')
 log.write(str(datetime.datetime.now())+"\n")
@@ -138,14 +147,21 @@ for i in range(REPEAT):
 
         if record_list:
             if record_list[-1].next[0] == pop_node and before_reward-pop_node.reward > 0:
-                max_reward = copy.deepcopy(pop_node.reward)
+                # max_reward = copy.deepcopy(pop_node.reward)
                 tmp = []
+                temp = None
                 for i in record_list[-1].next:
                     tmp.append(i.reward)
                 found_index = tmp.index(max(tmp))
-                record_list[-1].next[found_index], pop_node = pop_node, record_list[-1].next[found_index]
+                # record_list[-1].next[found_index], pop_node = pop_node, record_list[-1].next[found_index]
+                temp = record_list[-1].next[found_index]
+                record_list[-1].next[found_index] = pop_node
+                pop_node = temp
             elif pop_node.reward > record_list[-1].next[0].reward:
-                pop_node, record_list[-1].next[0] = record_list[-1].next[0], pop_node
+                # pop_node, record_list[-1].next[0] = record_list[-1].next[0], pop_node
+                temp = record_list[-1].next[found_index]
+                record_list[-1].next[found_index] = pop_node
+                pop_node = temp
 
     chess_model.accumulated_play += 1
     # if chess_model.accumulated_play%10 == 0:
