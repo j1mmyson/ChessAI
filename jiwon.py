@@ -16,7 +16,9 @@ class LinkedList:
             self.state = state
     def __init__(self):
         self.head = self.Node(None, None)
-        self.search_list = [[]]*33
+        self.search_list = []
+        for _ in range(33):
+            self.search_list.append([])
         self.size = 0
         self.accumulated_play = 0
     def insert(self, move, p, state):
