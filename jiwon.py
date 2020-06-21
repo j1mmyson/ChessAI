@@ -5,7 +5,7 @@ import sys
 import copy
 import datetime
 
-REPEAT = 50
+REPEAT = 500
 
 class LinkedList:
     class Node:
@@ -44,7 +44,7 @@ def counting(board):
     return count
 
 log = open("log.txt", 'a')
-log.write(str(datetime.datetime.now())+"\n")
+log.write("\n\nStart: " + str(datetime.datetime.now()) + "\n")
 log.close()
 
 try:
@@ -168,14 +168,14 @@ for i in range(REPEAT):
     chess_model.accumulated_play += 1
     # if chess_model.accumulated_play%10 == 0:
     log = open("log.txt", 'a')
-    log.write(str(chess_model.accumulated_play)+"\n")
+    log.write(str(chess_model.accumulated_play) + ": " + str(datetime.datetime.now()) + "\n")
     log.close()
 
 with open('data.pickle', 'wb') as f:
     pickle.dump(chess_model, f, pickle.HIGHEST_PROTOCOL)
 
 log = open("log.txt", 'a')
-log.write(str(datetime.datetime.now())+"\n")
+log.write("End: " + str(datetime.datetime.now()) + "\n\n")
 log.close()
 
 print("OK")
