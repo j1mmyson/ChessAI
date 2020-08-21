@@ -51,7 +51,7 @@ class LinkedList:
 
 print("data load start\n")
 
-with open('no_state_data_250000.pickle', 'rb') as f:
+with open('data.pickle', 'rb') as f:
     chess_model = pickle.load(f)
 
 sys.setrecursionlimit(10**7)
