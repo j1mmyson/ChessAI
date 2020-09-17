@@ -11,6 +11,6 @@
 ##### - ``MonteCarlo Tree Search``
 ##### - ...
 
-### 
+### Requirements
 ##### - python 3.6
 ##### - python-chess
